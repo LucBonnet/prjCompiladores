@@ -27,5 +27,11 @@ fator &rarr; id | valor | '(' expressao ')' </br>
 
 IF:
 if &rarr; '?' '<' condicao '>' '{' expressao '}' </br>
-ifelse &rarr; if '&' '{' expressao '}' </br>
-condicao &rarr; id opL id | id opL expressao | expressao opL expressao | expressao opL id
+ifelse &rarr; if '&' '{' instrucao '}' </br>
+condicao &rarr; id opL id | id opL expressao | expressao opL expressao | expressao opL id </br>
+
+WHILE:
+while &rarr; 'loop' '<' condicao '>' '{' instrucao\* '}'
+
+FOR:
+for &rarr; 'looplim' '<' (declaracao | atribuicao) '|' condicao '|' atribuicao '>' {' instrucao\* '}'
