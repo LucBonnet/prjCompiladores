@@ -28,5 +28,4 @@ fator &rarr; id | valor | '(' expressao ')'
 IF:
 if &rarr; '?' '<' condicao '>' '{' expressao '}'
 ifelse &rarr; if '&' '{' expressao '}'
-condicao &rarr; id opL id | id opL expressao | expressao opL valor | valor opL id
-
+condicao &rarr; id opL id | id opL expressao | expressao opL expressao | expressao opL id
