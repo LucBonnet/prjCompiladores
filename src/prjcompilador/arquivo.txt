@@ -1,1 +1,2 @@
-dec variavel1 -> 13.7645
+int a -> 10
+a -> b mnr 10

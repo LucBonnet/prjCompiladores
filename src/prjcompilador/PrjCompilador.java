@@ -33,14 +33,14 @@ public class PrjCompilador {
         Lexer lexer = new Lexer(texto);
         tokens = lexer.getTokens();
 
-//         for (Token token : tokens) {
-//         System.out.println(token);
-//         }
+        // for (Token token : tokens) {
+        // System.out.println(token);
+        // }
 
         // Analaisador Sintático
         Parser parser = new Parser(tokens);
         parser.main();
-        
+
         // Analaisador Semântico
 
     }

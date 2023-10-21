@@ -9,7 +9,7 @@ public class ID implements AFD {
 
   public String getId(String texto) {
     String result = "";
-    while (this.atual != '@' && Character.isAlphabetic(this.atual)) {
+    while (this.atual != '@' && (Character.isAlphabetic(this.atual) || Character.isDigit(this.atual))) {
       result += this.atual;
       avancar(texto);
     }
