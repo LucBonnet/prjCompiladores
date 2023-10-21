@@ -14,18 +14,18 @@ valor &rarr; int | dec | lgc | ltr | txt
 
 Atribuição:
 
-atribuicao &rarr; id opAtribuicao expressao
-expressao &rarr; expressao '+' termo | expressao '-' termo | termo
-termo &rarr; termo op fator | fator
-fator &rarr; id | int | lgc | ltr | txt | dec | lst | '(' expressao ')'
+atribuicao &rarr; id opAtribuicao expressao </br>
+expressao &rarr; expressao '+' termo | expressao '-' termo | termo </br>
+termo &rarr; termo op fator | fator </br>
+fator &rarr; id | int | lgc | ltr | txt | dec | lst | '(' expressao ')' </br>
 
 Declaração: 
-declaracao &rarr; tipo id opAtribuicao expressao | tipo id
-expressao &rarr; expressao '+' termo | expressao '-' termo | termo
-termo &rarr; termo op fator | fator
-fator &rarr; id | valor | '(' expressao ')'
+declaracao &rarr; tipo id opAtribuicao expressao | tipo id </br>
+expressao &rarr; expressao '+' termo | expressao '-' termo | termo </br>
+termo &rarr; termo op fator | fator </br>
+fator &rarr; id | valor | '(' expressao ')' </br>
 
 IF:
-if &rarr; '?' '<' condicao '>' '{' expressao '}'
-ifelse &rarr; if '&' '{' expressao '}'
+if &rarr; '?' '<' condicao '>' '{' expressao '}' </br>
+ifelse &rarr; if '&' '{' expressao '}' </br>
 condicao &rarr; id opL id | id opL expressao | expressao opL expressao | expressao opL id
