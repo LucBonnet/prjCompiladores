@@ -1,8 +1,0 @@
-dec a -> 10
-
-looplim < dec a -> 0 | a mnr 10 | a -> a + 1 > {
-  looplim < dec b -> 0 | b mnr 10 | b -> b + 1 > {
-  
-  }
-}
-

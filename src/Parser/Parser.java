@@ -276,6 +276,44 @@ public class Parser {
         }
     }
 
+    private void prt() {
+        if (Gramaticas.matchLex(token, "prt")) {
+            token = getNextToken();
+            if (Gramaticas.matchLex(token, "<")) {
+                token = getNextToken();
+                expressao();
+                if (Gramaticas.matchLex(token, ">")) {
+                    token = getNextToken();
+                } else {
+                    erro(token);
+                }
+            } else {
+                erro(token);
+            }
+        }
+    }
+
+    private void ent() {
+        if (Gramaticas.matchLex(token, "ent")) {
+            token = getNextToken();
+            if (Gramaticas.matchLex(token, "<")) {
+                token = getNextToken();
+                if (Gramaticas.tipo(token)) {
+                    token = getNextToken();
+                    if (Gramaticas.matchLex(token, ">")) {
+                        token = getNextToken();
+                    } else {
+                        erro(token);
+                    }
+                } else {
+                    erro(token);
+                }
+            } else {
+                erro(token);
+            }
+        }
+    }
+
     public void instrucao() {
         if (Gramaticas.id(token)) {
             atribuicao();
@@ -287,6 +325,10 @@ public class Parser {
             whileMain();
         } else if (Gramaticas.matchLex(token, "looplim")) {
             forMain();
+        } else if (Gramaticas.matchLex(token, "prt")) {
+            prt();
+        } else if (Gramaticas.matchLex(token, "ent")) {
+            ent();
         } else {
             erro(token);
             return;
