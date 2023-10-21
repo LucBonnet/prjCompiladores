@@ -1,6 +1,6 @@
 Gramáticas:
 
-tipo &rarr; 'dec' | 'int' | 'lgc' | 'ltr' | 'txt' 
+tipo &rarr; 'dec' | 'int' | 'lgc' | 'ltr' | 'txt' </br>
 id &rarr; [(a-zA-Z)+(a-zA-Z0-9)\*]
 int &rarr; [0-9]+
 dec &rarr; [(0-9)+(.0-9)\*]
