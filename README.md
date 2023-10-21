@@ -1,15 +1,15 @@
 Gramáticas:
 
 tipo &rarr; 'dec' | 'int' | 'lgc' | 'ltr' | 'txt' </br>
-id &rarr; [(a-zA-Z)+(a-zA-Z0-9)\*]
-int &rarr; [0-9]+
-dec &rarr; [(0-9)+(.0-9)\*]
-lgc &rarr; 'fls' | 'ver'
-ltr &rarr; [a-zA-Z]
-txt &rarr; '"' [(a-zA-Z)+(a-zA-Z0-9)\*] '"'
-opAtribuicao &rarr; '->' 
-opM &rarr; '*' | '/' | 'rst' | '^'
-opL &rarr; 'mnr' | 'mar' | 'equ' | 'mnri' | 'mari'
+id &rarr; [(a-zA-Z)+(a-zA-Z0-9)\*] </br>
+int &rarr; [0-9]+  </br>
+dec &rarr; [(0-9)+(.0-9)\*]  </br>
+lgc &rarr; 'fls' | 'ver' </br>
+ltr &rarr; [a-zA-Z] </br>
+txt &rarr; '"' [(a-zA-Z)+(a-zA-Z0-9)\*] '"' </br>
+opAtribuicao &rarr; '->'  </br>
+opM &rarr; '*' | '/' | 'rst' | '^' </br>
+opL &rarr; 'mnr' | 'mar' | 'equ' | 'mnri' | 'mari' </br>
 valor &rarr; int | dec | lgc | ltr | txt
 
 Atribuição:
