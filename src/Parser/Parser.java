@@ -117,6 +117,13 @@ public class Parser {
         }
     }
 
+    private void declaracaoAtribuicao() {
+        if (Gramaticas.opAtribuicao(token)) {
+            token = getNextToken();
+            expressao();
+        }
+    }
+
     private void declaracao() {
         if (Gramaticas.tipo(token)) {
             // tipo
@@ -124,13 +131,7 @@ public class Parser {
             if (Gramaticas.id(token)) {
                 // id
                 token = getNextToken();
-                if (Gramaticas.opAtribuicao(token)) {
-                    // ->
-                    token = getNextToken();
-                    expressao();
-                } else {
-                    erro(token);
-                }
+                declaracaoAtribuicao();
             } else {
                 erro(token);
             }
@@ -149,6 +150,7 @@ public class Parser {
 
                 if (Gramaticas.matchLex(token, "}")) {
                     token = getNextToken();
+                    System.out.println("ELSE");
                 } else {
                     erro(token);
                 }
@@ -177,6 +179,7 @@ public class Parser {
 
                         if (Gramaticas.matchLex(token, "}")) {
                             token = getNextToken();
+                            System.out.println("IF");
                             elseMain();
                         } else {
                             erro(token);
@@ -210,6 +213,7 @@ public class Parser {
 
                         if (Gramaticas.matchLex(token, "}")) {
                             token = getNextToken();
+                            System.out.println("LOOP");
                         } else {
                             erro(token);
                         }
@@ -255,6 +259,7 @@ public class Parser {
 
                                 if (Gramaticas.matchLex(token, "}")) {
                                     token = getNextToken();
+                                    System.out.println("LOOPLIM");
                                 } else {
                                     erro(token);
                                 }
@@ -284,6 +289,7 @@ public class Parser {
                 expressao();
                 if (Gramaticas.matchLex(token, ">")) {
                     token = getNextToken();
+                    System.out.println("PRINT");
                 } else {
                     erro(token);
                 }
@@ -300,8 +306,19 @@ public class Parser {
                 token = getNextToken();
                 if (Gramaticas.tipo(token)) {
                     token = getNextToken();
-                    if (Gramaticas.matchLex(token, ">")) {
+                    if (Gramaticas.matchLex(token, ",")) {
                         token = getNextToken();
+                        if (Gramaticas.id(token)) {
+                            token = getNextToken();
+                            if (Gramaticas.matchLex(token, ">")) {
+                                token = getNextToken();
+                                System.out.println("ENTRADA");
+                            } else {
+                                erro(token);
+                            }
+                        } else {
+                            erro(token);
+                        }
                     } else {
                         erro(token);
                     }
@@ -334,6 +351,8 @@ public class Parser {
             return;
         }
     }
+
+    // TODO FUNCAO
 
     public void main() {
         instrucao();

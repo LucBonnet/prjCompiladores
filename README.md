@@ -20,10 +20,11 @@ termo &rarr; termo op fator | fator </br>
 fator &rarr; id | int | lgc | ltr | txt | dec | lst | '(' expressao ')' </br>
 
 Declaração: 
-declaracao &rarr; tipo id opAtribuicao expressao | tipo id </br>
-expressao &rarr; expressao '+' termo | expressao '-' termo | termo </br>
-termo &rarr; termo op fator | fator </br>
-fator &rarr; id | valor | '(' expressao ')' </br>
+declaracao &rarr; tipo id 
+declaracaoAtribuicao &rarr; declaracao opAtribuicao expressao
+expressao &rarr; expressao '+' termo | expressao '-' termo | termo 
+termo &rarr; termo op fator | fator 
+fator &rarr; id | valor | '(' expressao ')' 
 
 IF:
 if &rarr; '?' '<' condicao '>' '{' expressao '}' </br>
@@ -37,7 +38,7 @@ FOR:
 for &rarr; 'looplim' '<' (declaracao | atribuicao) '|' condicao '|' atribuicao '>' {' instrucao\* '}'
 
 Entrada:
-ent &rarr; 'ent' '<' tipo '>'
+ent &rarr; 'ent' '<' tipo ',' id '>'
 
 Print:
 print &rarr; 'prt' '<' expressao '>'

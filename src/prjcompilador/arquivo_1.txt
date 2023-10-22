@@ -15,4 +15,3 @@ looplim <int i -> 0 | i mnr 11 | i++> {
   int nMoeda -> (temp - troco) / moedas[i]
   prtln(moedas[i] + ": " + nMoeda)
 }
-
