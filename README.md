@@ -42,3 +42,6 @@ ent &rarr; 'ent' '<' tipo ',' id '>'
 
 Print:
 print &rarr; 'prt' '<' expressao '>'
+
+Função:
+func &rarr; 'fnc' '<' (id)?(, id)* '>' '{' instrucao '}'

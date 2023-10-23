@@ -150,7 +150,6 @@ public class Parser {
 
                 if (Gramaticas.matchLex(token, "}")) {
                     token = getNextToken();
-                    System.out.println("ELSE");
                 } else {
                     erro(token);
                 }
@@ -179,7 +178,6 @@ public class Parser {
 
                         if (Gramaticas.matchLex(token, "}")) {
                             token = getNextToken();
-                            System.out.println("IF");
                             elseMain();
                         } else {
                             erro(token);
@@ -213,7 +211,6 @@ public class Parser {
 
                         if (Gramaticas.matchLex(token, "}")) {
                             token = getNextToken();
-                            System.out.println("LOOP");
                         } else {
                             erro(token);
                         }
@@ -259,7 +256,6 @@ public class Parser {
 
                                 if (Gramaticas.matchLex(token, "}")) {
                                     token = getNextToken();
-                                    System.out.println("LOOPLIM");
                                 } else {
                                     erro(token);
                                 }
@@ -289,7 +285,6 @@ public class Parser {
                 expressao();
                 if (Gramaticas.matchLex(token, ">")) {
                     token = getNextToken();
-                    System.out.println("PRINT");
                 } else {
                     erro(token);
                 }
@@ -312,7 +307,6 @@ public class Parser {
                             token = getNextToken();
                             if (Gramaticas.matchLex(token, ">")) {
                                 token = getNextToken();
-                                System.out.println("ENTRADA");
                             } else {
                                 erro(token);
                             }
@@ -331,7 +325,59 @@ public class Parser {
         }
     }
 
-    public void instrucao() {
+    private void func() {
+        if (Gramaticas.matchLex(token, "fnc")) {
+            token = getNextToken();
+            if (Gramaticas.matchLex(token, "<")) {
+                token = getNextToken();
+
+                if (Gramaticas.tipo(token)) {
+                    token = getNextToken();
+                    if (Gramaticas.id(token)) {
+                        token = getNextToken();
+                        while (!Gramaticas.matchLex(token, ">")) {
+                            if (Gramaticas.matchLex(token, ",")) {
+                                token = getNextToken();
+                                if (Gramaticas.tipo(token)) {
+                                    token = getNextToken();
+                                    if (Gramaticas.id(token)) {
+                                        token = getNextToken();
+                                    } else {
+                                        erro(token);
+                                    }
+                                } else {
+                                    erro(token);
+                                }
+                            }
+                        }
+                    } else {
+                        erro(token);
+                    }
+                }
+
+                if (Gramaticas.matchLex(token, ">")) {
+                    token = getNextToken();
+                    if (Gramaticas.matchLex(token, "{")) {
+                        token = getNextToken();
+
+                        while (!Gramaticas.matchLex(token, "}")) {
+                            instrucao();
+                        }
+
+                        if (Gramaticas.matchLex(token, "}")) {
+                            token = getNextToken();
+                        } else {
+                            erro(token);
+                        }
+                    }
+                } else {
+                    erro(token);
+                }
+            }
+        }
+    }
+
+    public Boolean instrucao() {
         if (Gramaticas.id(token)) {
             atribuicao();
         } else if (Gramaticas.tipo(token)) {
@@ -348,14 +394,18 @@ public class Parser {
             ent();
         } else {
             erro(token);
-            return;
+            return false;
         }
+
+        return true;
     }
 
-    // TODO FUNCAO
-
     public void main() {
-        instrucao();
+        if (Gramaticas.matchLex(token, "fnc")) {
+            func();
+        } else {
+            instrucao();
+        }
 
         if (tokens.size() > 0) {
             main();

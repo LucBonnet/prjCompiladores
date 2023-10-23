@@ -1,1 +1,5 @@
-dec num 
+fnc <dec a, dec b> {
+  ? <a> {
+
+  }
+}
