@@ -2,12 +2,14 @@ package Parser;
 
 import java.util.List;
 
+import Translator.Translator;
 import Utils.Token;
 
 public class Parser {
 
     List<Token> tokens;
     Token token;
+    Translator tradutor = new Translator();
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
