@@ -144,6 +144,13 @@ public class Parser {
 
     private void compLexema(String lexema) {
         if (Gramaticas.matchLex(token, lexema)) {
+            if (token.lexema.equals("<")) {
+                tr.setText("(");
+            } else if (token.lexema.equals(">")) {
+                tr.setText(")");
+            } else {
+                tr.setText(lexema);
+            }
             token = getNextToken();
         } else {
             erro(token);
