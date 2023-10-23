@@ -44,4 +44,4 @@ Print:
 print &rarr; 'prt' '<' expressao '>'
 
 Função:
-func &rarr; 'fnc' '<' (id)?(, id)* '>' '{' instrucao '}'
+func &rarr; 'fnc' tipo '<' (id)?(, id)* '>' '{' instrucao '}'

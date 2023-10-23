@@ -1,5 +1,3 @@
-fnc < dec a, dec b> {
-  ? <a> {
-
-  }
+fnc txt <dec a, txt b> {
+  
 }

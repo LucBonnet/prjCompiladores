@@ -7,9 +7,12 @@ import Utils.Token;
 
 public class Parser {
 
+    // TODO Mudar métodos
+    // TODO Criar árvore
+
     List<Token> tokens;
     Token token;
-    Translator tradutor = new Translator();
+    Translator tr = new Translator();
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -27,7 +30,7 @@ public class Parser {
     // metodos
     private void erro(Token token) {
         if (token == null) {
-            System.out.println("Erro");
+            System.out.println("Erro ");
         } else {
             System.out.println("Erro: " + token);
             System.out.println("Linha: " + token.linha);
@@ -35,6 +38,116 @@ public class Parser {
         }
 
         throw new Error("Erro");
+    }
+
+    private void tipo() {
+        String tipos[] = { "int", "dec", "txt", "lgc", "ltr", "lst" };
+        Boolean reconhecido = false;
+
+        for (String tipo : tipos) {
+            if (Gramaticas.matchLex(token, tipo)) {
+                reconhecido = true;
+            }
+        }
+
+        if (reconhecido) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
+    }
+
+    private void id() {
+        if (Gramaticas.matchTipo(token, "ID")) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
+    }
+
+    private void opAtribuicao() {
+        if (Gramaticas.matchTipo(token, "OP_ATRIBUICAO")) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
+    }
+
+    private void opM() {
+        String ops[] = { "*", "/", "rst", "^" };
+        Boolean reconhecido = false;
+
+        for (String op : ops) {
+            if (Gramaticas.matchLex(token, op)) {
+                reconhecido = true;
+            }
+        }
+
+        if (reconhecido) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
+    }
+
+    private void op() {
+        String ops[] = { "INT", "DEC", "TEXT", "RES_FLS", "RES_VER", "CHAR", "mnr", "mar", "equ", "mnri", "mari" };
+        Boolean reconhecido = false;
+
+        for (String op : ops) {
+            if (Gramaticas.matchLex(token, op)) {
+                reconhecido = true;
+            }
+        }
+
+        if (reconhecido) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
+    }
+
+    private void opL() {
+        String ops[] = { "mnr", "mar", "equ", "mnri", "mari" };
+        Boolean reconhecido = false;
+
+        for (String op : ops) {
+            if (Gramaticas.matchLex(token, op)) {
+                reconhecido = true;
+                break;
+            }
+        }
+
+        if (reconhecido) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
+    }
+
+    private void valor() {
+        String valores[] = { "INT", "DEC", "TEXT", "RES_FLS", "RES_VER", "CHAR" };
+        Boolean reconhecido = false;
+
+        for (String valor : valores) {
+            if (Gramaticas.matchTipo(token, valor)) {
+                reconhecido = true;
+            }
+        }
+
+        if (reconhecido) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
+    }
+
+    private void compLexema(String lexema) {
+        if (Gramaticas.matchLex(token, lexema)) {
+            token = getNextToken();
+        } else {
+            erro(token);
+        }
     }
 
     private void expressao() {
@@ -56,8 +169,8 @@ public class Parser {
     }
 
     private void termoL() {
-        if (Gramaticas.opM(token) || Gramaticas.opL(token)) {
-            token = getNextToken();
+        if (Gramaticas.opL(token) || Gramaticas.opM(token)) {
+            op();
             fator();
             termoL();
         }
@@ -69,13 +182,9 @@ public class Parser {
         } else if (Gramaticas.valor(token)) {
             token = getNextToken();
         } else if (Gramaticas.matchLex(token, "(")) {
-            token = getNextToken();
+            compLexema("(");
             expressao();
-            if (Gramaticas.matchLex(token, ")")) {
-                token = getNextToken();
-            } else {
-                erro(token);
-            }
+            compLexema(")");
         } else {
             erro(token);
         }
@@ -84,194 +193,117 @@ public class Parser {
     private void condicao() {
         if (Gramaticas.matchTipo(token, "ID")) {
             token = getNextToken();
-            if (Gramaticas.opL(token)) {
-                token = getNextToken();
-                if (Gramaticas.matchTipo(token, "ID")) {
-                    token = getNextToken();
-                } else {
-                    expressao();
-                }
+            opL();
+            if (Gramaticas.matchTipo(token, "ID")) {
+                id();
+            } else {
+                expressao();
             }
         } else {
             expressao();
-            if (Gramaticas.opL(token)) {
-                token = getNextToken();
-                if (Gramaticas.matchTipo(token, "ID")) {
-                    token = getNextToken();
-                } else {
-                    expressao();
-                }
+            opL();
+            if (Gramaticas.matchTipo(token, "ID")) {
+                id();
             } else {
-                erro(token);
+                expressao();
             }
         }
     }
 
     private void atribuicao() {
-        if (Gramaticas.id(token)) {
-            // id
-            token = getNextToken();
-            if (Gramaticas.opAtribuicao(token)) {
-                // ->
-                token = getNextToken();
-                expressao();
-            } else {
-                erro(token);
-            }
-        }
+        id();
+        opAtribuicao();
+        expressao();
     }
 
     private void declaracaoAtribuicao() {
-        if (Gramaticas.opAtribuicao(token)) {
-            token = getNextToken();
-            expressao();
-        }
+        opAtribuicao();
+        expressao();
     }
 
     private void declaracao() {
-        if (Gramaticas.tipo(token)) {
-            // tipo
+        tipo();
+        id();
+        declaracaoAtribuicao();
+    }
+
+    private void rtn() {
+        if (Gramaticas.matchLex(token, "rtn")) {
             token = getNextToken();
-            if (Gramaticas.id(token)) {
-                // id
-                token = getNextToken();
-                declaracaoAtribuicao();
-            } else {
-                erro(token);
+            id();
+        }
+    }
+
+    private void bloco(Boolean func) {
+        if (Gramaticas.matchLex(token, "{")) {
+            compLexema("{");
+
+            while (!Gramaticas.matchLex(token, "}")) {
+                if (Gramaticas.matchLex(token, "rtn") && func) {
+                    rtn();
+                } else {
+                    instrucao();
+                }
             }
+
+            compLexema("}");
+        } else {
+            erro(token);
         }
     }
 
     private void elseMain() {
         if (Gramaticas.matchLex(token, "&")) {
             token = getNextToken();
-            if (Gramaticas.matchLex(token, "{")) {
-                token = getNextToken();
-
-                while (!Gramaticas.matchLex(token, "}")) {
-                    instrucao();
-                }
-
-                if (Gramaticas.matchLex(token, "}")) {
-                    token = getNextToken();
-                } else {
-                    erro(token);
-                }
-            } else {
-                erro(token);
-            }
+            bloco(false);
         }
     }
 
     private void ifMain() {
         if (Gramaticas.matchLex(token, "?")) {
-            // ?
             token = getNextToken();
-            if (Gramaticas.matchLex(token, "<")) {
-                // <
-                token = getNextToken();
-                condicao();
-                if (Gramaticas.matchLex(token, ">")) {
-                    token = getNextToken();
-                    if (Gramaticas.matchLex(token, "{")) {
-                        token = getNextToken();
-
-                        while (!Gramaticas.matchLex(token, "}")) {
-                            instrucao();
-                        }
-
-                        if (Gramaticas.matchLex(token, "}")) {
-                            token = getNextToken();
-                            elseMain();
-                        } else {
-                            erro(token);
-                        }
-                    } else {
-                        erro(token);
-                    }
-                } else {
-                    erro(token);
-                }
-            } else {
-                erro(token);
-            }
+            compLexema("<");
+            condicao();
+            compLexema(">");
+            bloco(false);
+            elseMain();
         }
     }
 
     private void whileMain() {
         if (Gramaticas.matchLex(token, "loop")) {
             token = getNextToken();
-            if (Gramaticas.matchLex(token, "<")) {
-                token = getNextToken();
-                condicao();
-                if (Gramaticas.matchLex(token, ">")) {
-                    token = getNextToken();
-                    if (Gramaticas.matchLex(token, "{")) {
-                        token = getNextToken();
+            compLexema("<");
+            condicao();
+            compLexema(">");
+            bloco(false);
+        }
+    }
 
-                        while (!Gramaticas.matchLex(token, "}")) {
-                            instrucao();
-                        }
-
-                        if (Gramaticas.matchLex(token, "}")) {
-                            token = getNextToken();
-                        } else {
-                            erro(token);
-                        }
-                    } else {
-                        erro(token);
-                    }
-                } else {
-                    erro(token);
-                }
-            } else {
-                erro(token);
-            }
+    private void forAtribuicaoDeclaracao() {
+        if (Gramaticas.tipo(token)) {
+            declaracao();
+        } else if (Gramaticas.id(token)) {
+            atribuicao();
+        } else {
+            erro(token);
         }
     }
 
     private void forMain() {
         if (Gramaticas.matchLex(token, "looplim")) {
             token = getNextToken();
-            if (Gramaticas.matchLex(token, "<")) {
-                token = getNextToken();
-                if (Gramaticas.tipo(token)) {
-                    declaracao();
-                } else if (Gramaticas.id(token)) {
-                    atribuicao();
-                } else {
-                    erro(token);
-                }
+            compLexema("<");
+            forAtribuicaoDeclaracao();
 
+            if (Gramaticas.matchLex(token, "|")) {
+                token = getNextToken();
+                condicao();
                 if (Gramaticas.matchLex(token, "|")) {
                     token = getNextToken();
-                    condicao();
-                    if (Gramaticas.matchLex(token, "|")) {
-                        token = getNextToken();
-                        atribuicao();
-                        if (Gramaticas.matchLex(token, ">")) {
-                            token = getNextToken();
-                            if (Gramaticas.matchLex(token, "{")) {
-                                token = getNextToken();
-
-                                while (!Gramaticas.matchLex(token, "}")) {
-                                    instrucao();
-                                }
-
-                                if (Gramaticas.matchLex(token, "}")) {
-                                    token = getNextToken();
-                                } else {
-                                    erro(token);
-                                }
-                            } else {
-                                erro(token);
-                            }
-                        } else {
-                            erro(token);
-                        }
-                    } else {
-                        erro(token);
-                    }
+                    atribuicao();
+                    compLexema(">");
+                    bloco(false);
                 } else {
                     erro(token);
                 }
@@ -284,42 +316,22 @@ public class Parser {
     private void prt() {
         if (Gramaticas.matchLex(token, "prt")) {
             token = getNextToken();
-            if (Gramaticas.matchLex(token, "<")) {
-                token = getNextToken();
-                expressao();
-                if (Gramaticas.matchLex(token, ">")) {
-                    token = getNextToken();
-                } else {
-                    erro(token);
-                }
-            } else {
-                erro(token);
-            }
+            compLexema("<");
+            expressao();
+            compLexema(">");
         }
     }
 
     private void ent() {
         if (Gramaticas.matchLex(token, "ent")) {
             token = getNextToken();
-            if (Gramaticas.matchLex(token, "<")) {
+            compLexema("<");
+            if (Gramaticas.tipo(token)) {
                 token = getNextToken();
-                if (Gramaticas.tipo(token)) {
+                if (Gramaticas.matchLex(token, ",")) {
                     token = getNextToken();
-                    if (Gramaticas.matchLex(token, ",")) {
-                        token = getNextToken();
-                        if (Gramaticas.id(token)) {
-                            token = getNextToken();
-                            if (Gramaticas.matchLex(token, ">")) {
-                                token = getNextToken();
-                            } else {
-                                erro(token);
-                            }
-                        } else {
-                            erro(token);
-                        }
-                    } else {
-                        erro(token);
-                    }
+                    id();
+                    compLexema(">");
                 } else {
                     erro(token);
                 }
@@ -332,53 +344,28 @@ public class Parser {
     private void func() {
         if (Gramaticas.matchLex(token, "fnc")) {
             token = getNextToken();
-            if (Gramaticas.matchLex(token, "<")) {
+
+            tipo();
+            compLexema("<");
+
+            if (Gramaticas.tipo(token)) {
                 token = getNextToken();
-
-                if (Gramaticas.tipo(token)) {
-                    token = getNextToken();
-                    if (Gramaticas.id(token)) {
-                        token = getNextToken();
-                        while (!Gramaticas.matchLex(token, ">")) {
-                            if (Gramaticas.matchLex(token, ",")) {
-                                token = getNextToken();
-                                if (Gramaticas.tipo(token)) {
-                                    token = getNextToken();
-                                    if (Gramaticas.id(token)) {
-                                        token = getNextToken();
-                                    } else {
-                                        erro(token);
-                                    }
-                                } else {
-                                    erro(token);
-                                }
-                            }
-                        }
-                    } else {
-                        erro(token);
-                    }
+                id();
+                while (!Gramaticas.matchLex(token, ">")) {
+                    compLexema(",");
+                    tipo();
+                    id();
                 }
-
-                if (Gramaticas.matchLex(token, ">")) {
-                    token = getNextToken();
-                    if (Gramaticas.matchLex(token, "{")) {
-                        token = getNextToken();
-
-                        while (!Gramaticas.matchLex(token, "}")) {
-                            instrucao();
-                        }
-
-                        if (Gramaticas.matchLex(token, "}")) {
-                            token = getNextToken();
-                        } else {
-                            erro(token);
-                        }
-                    }
-                } else {
-                    erro(token);
-                }
+                compLexema(">");
+                bloco(true);
+            } else if (Gramaticas.matchLex(token, ">")) {
+                compLexema(">");
+                bloco(true);
+            } else {
+                erro(token);
             }
         }
+
     }
 
     public Boolean instrucao() {
