@@ -1,18 +1,33 @@
 package Translator;
 
 public class Tree {
-  Node root;
+  public Node root;
 
   public Tree(Node root) {
     this.root = root;
   }
 
-  public void simpleWalk(Node node) {
+  public void print(Node node) {
+    simpleWalk(node, 0);
+  }
+
+  public void simpleWalk(Node node, int tab) {
+    System.out.print("\n");
+    for (int i = 0; i < tab; i++) {
+      System.out.print(" | ");
+    }
     System.out.print(" " + node.data + " ");
     for (Node child : node.getChildren()) {
-      simpleWalk(child);
+      simpleWalk(child, tab + 1);
     }
   }
+
+  // public void simpleWalk(Node node) {
+  // System.out.print(" " + node.data + " ");
+  // for (Node child : node.getChildren()) {
+  // simpleWalk(child);
+  // }
+  // }
 
   public void walk(Node node) {
     System.out.print(node.enter);

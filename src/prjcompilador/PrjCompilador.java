@@ -8,6 +8,7 @@ import java.util.List;
 
 import Lexer.Lexer;
 import Parser.Parser;
+import Translator.Tree;
 import Utils.Token;
 
 public class PrjCompilador {
@@ -39,7 +40,11 @@ public class PrjCompilador {
 
         // Analaisador Sintático
         Parser parser = new Parser(tokens);
-        parser.main();
+        Tree tree = parser.main();
+        tree.walk(tree.root);
+
+        System.out.println("\n");
+        tree.print(tree.root);
 
         // Analaisador Semântico
 
