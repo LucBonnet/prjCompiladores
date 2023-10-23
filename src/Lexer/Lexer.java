@@ -18,7 +18,7 @@ public class Lexer {
     this.texto = texto;
     this.pos = 0;
     this.atual = texto.charAt(pos);
-    
+
     this.afds = InstanceAFDS.getAFDs();
   }
 
@@ -61,6 +61,7 @@ public class Lexer {
       for (AFD afd : afds) {
         Token reconhecido = afd.processa(pos, texto);
         if (reconhecido != null) {
+          reconhecido.setLinhaColuna(line, col);
           avancar(reconhecido.getLength());
           return reconhecido;
         }

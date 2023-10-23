@@ -5,7 +5,6 @@ import java.util.List;
 import Utils.Token;
 
 public class Parser {
-    // TODO LINHA E COLUNA DO ERRO
 
     List<Token> tokens;
     Token token;
@@ -25,12 +24,15 @@ public class Parser {
 
     // metodos
     private void erro(Token token) {
-        System.out.println("Erro: " + token);
-        throw new Error("Erro");
-    }
+        if (token == null) {
+            System.out.println("Erro");
+        } else {
+            System.out.println("Erro: " + token);
+            System.out.println("Linha: " + token.linha);
+            System.out.println("Coluna: " + token.coluna);
+        }
 
-    private void erro() {
-        System.out.println("Erro");
+        throw new Error("Erro");
     }
 
     private void expressao() {

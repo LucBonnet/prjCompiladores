@@ -1,4 +1,4 @@
-fnc <dec a, dec b> {
+fnc < dec a, dec b> {
   ? <a> {
 
   }
