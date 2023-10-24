@@ -13,32 +13,45 @@ public class Parser {
 
     List<Token> tokens;
     Token token;
+    Token tokenAnterior;
     Tree tree;
+    boolean erro = false;
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
-        this.token = getNextToken();
+        getNextToken();
     }
 
-    public Token getNextToken() {
+    public void getNextToken() {
+        tokenAnterior = token;
         if (tokens.size() > 0) {
-            return tokens.remove(0);
+            this.token = tokens.remove(0);
         } else {
-            return null;
+            this.token = null;
         }
     }
 
     // metodos
-    private void erro(Token token) {
-        if (token == null) {
-            System.out.println("Erro ");
-        } else {
-            System.out.println("Erro: " + token);
-            System.out.println("Linha: " + token.linha);
-            System.out.println("Coluna: " + token.coluna);
+    private void erro() {
+        if (erro) {
+            getNextToken();
+            return;
         }
 
-        throw new Error("Erro");
+        erro = true;
+        if (this.token == null) {
+            System.out.println("Erro: " + tokenAnterior);
+        } else {
+            System.out.println("Erro: " + this.token);
+            System.out.println("Linha: " + this.token.linha);
+            System.out.println("Coluna: " + this.token.coluna);
+        }
+
+        getNextToken();
+
+        if (this.token == null) {
+            System.exit(0);
+        }
     }
 
     private void tipo(Node node) {
@@ -56,9 +69,28 @@ public class Parser {
         if (index > -1) {
             Node newNode = new Node(tr[index]);
             node.addChild(newNode);
-            token = getNextToken();
+            getNextToken();
         } else {
-            erro(token);
+            erro();
+        }
+    }
+
+    private void idLista(Node node) {
+        if (Gramaticas.matchLex(token, "[")) {
+            node.exit += "[";
+            getNextToken();
+
+            if (Gramaticas.matchTipo(token, "INT")) {
+                node.exit += token.lexema;
+                getNextToken();
+            }
+
+            if (Gramaticas.matchLex(token, "]")) {
+                node.exit += "]";
+                getNextToken();
+            } else {
+                erro();
+            }
         }
     }
 
@@ -68,9 +100,39 @@ public class Parser {
             node.addChild(newNode);
 
             newNode.data = token.lexema;
-            token = getNextToken();
+            getNextToken();
+
+            idLista(newNode);
         } else {
-            erro(token);
+            erro();
+        }
+    }
+
+    private void idDec(Node node) {
+        if (Gramaticas.matchTipo(token, "ID")) {
+            Node newNode = new Node("id");
+            node.addChild(newNode);
+
+            newNode.data = token.lexema;
+            getNextToken();
+
+            idListaDec(newNode);
+        } else {
+            erro();
+        }
+    }
+
+    private void idListaDec(Node node) {
+        if (Gramaticas.matchLex(token, "[")) {
+            node.exit += "[";
+            getNextToken();
+
+            if (Gramaticas.matchLex(token, "]")) {
+                node.exit += "]";
+                getNextToken();
+            } else {
+                erro();
+            }
         }
     }
 
@@ -80,9 +142,9 @@ public class Parser {
             node.addChild(newNode);
 
             newNode.data = "=";
-            token = getNextToken();
+            getNextToken();
         } else {
-            erro(token);
+            erro();
         }
     }
 
@@ -97,9 +159,9 @@ public class Parser {
         }
 
         if (reconhecido) {
-            token = getNextToken();
+            getNextToken();
         } else {
-            erro(token);
+            erro();
         }
     }
 
@@ -117,15 +179,15 @@ public class Parser {
 
         if (index > -1) {
             node.data = tr[index];
-            token = getNextToken();
+            getNextToken();
         } else {
-            erro(token);
+            erro();
         }
     }
 
     private void opPow(Node nodeExp, Node node) {
         if (Gramaticas.matchLex(token, "^")) {
-            token = getNextToken();
+            getNextToken();
             nodeExp.enter = "Math.pow(Double.parseDouble(";
             Node newNode = new Node("),Double.parseDouble(");
             node.addChild(newNode);
@@ -148,34 +210,36 @@ public class Parser {
         if (index > -1) {
             Node newNode = new Node(tr[index]);
             node.addChild(newNode);
-            token = getNextToken();
+            getNextToken();
         } else {
-            erro(token);
+            erro();
         }
     }
 
-    private void valor() {
+    private void valor(Node node) {
         String valores[] = { "INT", "DEC", "TEXT", "RES_FLS", "RES_VER", "CHAR" };
         Boolean reconhecido = false;
 
         for (String valor : valores) {
             if (Gramaticas.matchTipo(token, valor)) {
                 reconhecido = true;
+                break;
             }
         }
 
         if (reconhecido) {
-            token = getNextToken();
+            node.data = token.lexema;
+            getNextToken();
         } else {
-            erro(token);
+            erro();
         }
     }
 
     private void compLexema(String lexema) {
         if (Gramaticas.matchLex(token, lexema)) {
-            token = getNextToken();
+            getNextToken();
         } else {
-            erro(token);
+            erro();
         }
     }
 
@@ -195,7 +259,7 @@ public class Parser {
 
             Node newNode = new Node("expressaoL");
             node.addChild(newNode);
-            token = getNextToken();
+            getNextToken();
 
             Node nodeTermo = new Node("termo");
             newNode.addChild(nodeTermo);
@@ -244,10 +308,10 @@ public class Parser {
     private void fator(Node node) {
         if (Gramaticas.matchTipo(token, "ID")) {
             node.data = token.lexema;
-            token = getNextToken();
+            getNextToken();
         } else if (Gramaticas.valor(token)) {
             node.data = token.lexema;
-            token = getNextToken();
+            getNextToken();
         } else if (Gramaticas.matchLex(token, "(")) {
             node.enter = "(";
             compLexema("(");
@@ -259,7 +323,7 @@ public class Parser {
             compLexema(")");
             node.exit = ")";
         } else {
-            erro(token);
+            erro();
         }
     }
 
@@ -317,9 +381,34 @@ public class Parser {
         node.addChild(nodeOp);
         opAtribuicao(nodeOp);
 
-        Node nodeExpressao = new Node("expressao");
-        node.addChild(nodeExpressao);
-        expressao(nodeExpressao);
+        if (Gramaticas.matchLex(token, "[")) {
+            Node nodeLista = new Node("");
+            node.addChild(nodeLista);
+            nodeLista.enter = "{";
+            getNextToken();
+
+            if (Gramaticas.valor(token)) {
+                Node nodeValorP = new Node("Valor");
+                nodeLista.addChild(nodeValorP);
+                valor(nodeValorP);
+
+                while (!Gramaticas.matchLex(token, "]")) {
+                    compLexema(",");
+
+                    Node nodeValorP2 = new Node("Valor");
+                    nodeLista.addChild(nodeValorP2);
+                    nodeValorP2.enter = ",";
+                    valor(nodeValorP2);
+                }
+            }
+
+            compLexema("]");
+            node.exit = "}";
+        } else {
+            Node nodeExpressao = new Node("expressao");
+            node.addChild(nodeExpressao);
+            expressao(nodeExpressao);
+        }
     }
 
     private void declaracao(Node node) {
@@ -329,17 +418,19 @@ public class Parser {
 
         Node nodeId = new Node("id");
         node.addChild(nodeId);
-        id(nodeId);
+        idDec(nodeId);
 
-        Node nodeDA = new Node("decAtri");
-        node.addChild(nodeDA);
-        declaracaoAtribuicao(nodeDA);
+        if (Gramaticas.matchLex(token, "->")) {
+            Node nodeDA = new Node("decAtri");
+            node.addChild(nodeDA);
+            declaracaoAtribuicao(nodeDA);
+        }
     }
 
     private void rtn(Node node) {
         if (Gramaticas.matchLex(token, "rtn")) {
             node.enter = "return";
-            token = getNextToken();
+            getNextToken();
             Node nodeExpressao = new Node("expressao");
             node.addChild(nodeExpressao);
             expressao(nodeExpressao);
@@ -367,7 +458,7 @@ public class Parser {
             compLexema("}");
             node.exit = "}";
         } else {
-            erro(token);
+            erro();
         }
     }
 
@@ -376,7 +467,7 @@ public class Parser {
             Node newNode = new Node("else");
             node.addChild(newNode);
             newNode.enter = "else";
-            token = getNextToken();
+            getNextToken();
 
             Node nodeBloco = new Node("bloco");
             newNode.addChild(nodeBloco);
@@ -387,7 +478,7 @@ public class Parser {
     private void ifMain(Node node) {
         if (Gramaticas.matchLex(token, "?")) {
             node.enter = "if";
-            token = getNextToken();
+            getNextToken();
             compLexema("<");
 
             Node nodeCondicao = new Node("condicao");
@@ -408,7 +499,7 @@ public class Parser {
     private void whileMain(Node node) {
         if (Gramaticas.matchLex(token, "loop")) {
             node.enter = "while";
-            token = getNextToken();
+            getNextToken();
             compLexema("<");
 
             Node nodeCond = new Node("condicao");
@@ -431,7 +522,7 @@ public class Parser {
         } else if (Gramaticas.id(token)) {
             atribuicao(node);
         } else {
-            erro(token);
+            erro();
         }
     }
 
@@ -440,7 +531,7 @@ public class Parser {
         forAtribuicaoDeclaracao(node);
 
         if (Gramaticas.matchLex(token, "|")) {
-            token = getNextToken();
+            getNextToken();
 
             Node nodeCondicao = new Node("condicao");
             node.addChild(nodeCondicao);
@@ -448,7 +539,7 @@ public class Parser {
             nodeCondicao.exit = ";";
 
             if (Gramaticas.matchLex(token, "|")) {
-                token = getNextToken();
+                getNextToken();
 
                 Node nodeAtribuicao = new Node("atribuicao");
                 node.addChild(nodeAtribuicao);
@@ -457,17 +548,17 @@ public class Parser {
                 compLexema(">");
                 nodeAtribuicao.exit = ";";
             } else {
-                erro(token);
+                erro();
             }
         } else {
-            erro(token);
+            erro();
         }
         node.exit = ")";
     }
 
     private void forMain(Node node) {
         if (Gramaticas.matchLex(token, "looplim")) {
-            token = getNextToken();
+            getNextToken();
             compLexema("<");
 
             Node nodeParametros = new Node(" parametros for");
@@ -482,7 +573,7 @@ public class Parser {
 
     private void comentario() {
         if (Gramaticas.matchTipo(token, "COMENTARIO")) {
-            token = getNextToken();
+            getNextToken();
         }
     }
 
@@ -493,7 +584,7 @@ public class Parser {
             else
                 node.enter = "System.out.println(";
 
-            token = getNextToken();
+            getNextToken();
             compLexema("<");
 
             Node nodeExpressao = new Node("expressao");
@@ -508,20 +599,20 @@ public class Parser {
     private void ent(Node node) {
         if (Gramaticas.matchLex(token, "ent")) {
             node.enter = "Scanner sc" + token.linha + "" + token.coluna + " = new Scanner(System.in);";
-            token = getNextToken();
+            getNextToken();
             compLexema("<");
             Node nodeTipo = new Node("tipo");
             node.addChild(nodeTipo);
             tipo(nodeTipo);
 
             if (Gramaticas.matchLex(token, ",")) {
-                token = getNextToken();
+                getNextToken();
                 Node nodeId = new Node("id");
                 node.addChild(nodeId);
                 id(nodeId);
                 compLexema(">");
             } else {
-                erro(token);
+                erro();
             }
 
             node.exit = " = sc.next";
@@ -549,7 +640,7 @@ public class Parser {
     private void func(Node node) {
         if (Gramaticas.matchLex(token, "fnc")) {
             Node nodeFunc = new Node("func");
-            token = getNextToken();
+            getNextToken();
             nodeFunc.enter = "public static ";
             node.addChild(nodeFunc);
 
@@ -605,7 +696,7 @@ public class Parser {
                 nodeFunc.addChild(nodeBloco);
                 bloco(nodeBloco, true);
             } else {
-                erro(token);
+                erro();
             }
         }
 
@@ -613,39 +704,46 @@ public class Parser {
 
     public Boolean instrucao(Node node) {
         if (Gramaticas.id(token)) {
+            erro = false;
             Node newNode = new Node("atribuicao");
             node.addChild(newNode);
             atribuicao(newNode);
-            newNode.exit = ";";
+            newNode.exit += ";";
         } else if (Gramaticas.tipo(token)) {
+            erro = false;
             Node newNode = new Node("declaracao");
             node.addChild(newNode);
             declaracao(newNode);
-            newNode.exit = ";";
+            newNode.exit += ";";
         } else if (Gramaticas.matchLex(token, "?")) {
+            erro = false;
             Node newNode = new Node("if");
             node.addChild(newNode);
             ifMain(newNode);
         } else if (Gramaticas.matchLex(token, "loop")) {
+            erro = false;
             Node newNode = new Node("while");
             node.addChild(newNode);
             whileMain(newNode);
         } else if (Gramaticas.matchLex(token, "looplim")) {
+            erro = false;
             Node newNode = new Node("for");
             node.addChild(newNode);
             forMain(newNode);
         } else if (Gramaticas.matchLex(token, "prt") || Gramaticas.matchLex(token, "prtln")) {
+            erro = false;
             Node newNode = new Node("prt");
             node.addChild(newNode);
             prt(newNode);
         } else if (Gramaticas.matchLex(token, "ent")) {
+            erro = false;
             Node newNode = new Node("ent");
             node.addChild(newNode);
             ent(newNode);
         } else if (Gramaticas.matchTipo(token, "COMENTARIO")) {
             comentario();
         } else {
-            erro(token);
+            erro();
             return false;
         }
 
@@ -653,7 +751,7 @@ public class Parser {
     }
 
     public void code(Node nodeClass, Node nodeMain) {
-        if (Gramaticas.matchLex(token, "fnc")) {
+        if (Gramaticas.matchLex(this.token, "fnc")) {
             func(nodeClass);
         } else {
             instrucao(nodeMain);
@@ -668,7 +766,7 @@ public class Parser {
         Node nodeRoot = new Node("root");
 
         Node nodeClass = new Node("");
-        nodeClass.enter = "class Main {\n";
+        nodeClass.enter = "import java.util.Scanner;\nclass Main {\n";
         nodeRoot.addChild(nodeClass);
 
         Node nodeMain = new Node("main");
@@ -680,6 +778,11 @@ public class Parser {
         tree = new Tree(nodeRoot);
 
         code(nodeClass, nodeMain);
+
+        // TODO ERRO;
+        if (erro) {
+            tree.root = null;
+        }
 
         return tree;
     }

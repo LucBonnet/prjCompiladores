@@ -30,13 +30,12 @@ public class PrjCompilador {
         List<Token> tokens = new ArrayList<>();
 
         // Analisador Lexico
-        System.out.println("Lexer>: ");
         Lexer lexer = new Lexer(texto);
         tokens = lexer.getTokens();
 
-        // for (Token token : tokens) {
-        // System.out.println(token);
-        // }
+        for (Token token : tokens) {
+            System.out.println(token);
+        }
 
         // Analaisador Sintático
         Parser parser = new Parser(tokens);
@@ -44,6 +43,8 @@ public class PrjCompilador {
         tree.walk(tree.root);
 
         tree.print(tree.root);
+        System.out.println("\n\n\n\n");
+        System.out.println(tree.code);
 
         // Analaisador Semântico
 

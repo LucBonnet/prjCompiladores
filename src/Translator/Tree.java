@@ -2,13 +2,19 @@ package Translator;
 
 public class Tree {
   public Node root;
+  public String code;
 
   public Tree(Node root) {
     this.root = root;
+    this.code = "";
   }
 
   public void print(Node node) {
+    if (node == null)
+      return;
+
     simpleWalk(node, 0);
+    System.out.println("");
   }
 
   public void simpleWalk(Node node, int tab) {
@@ -23,13 +29,16 @@ public class Tree {
   }
 
   public void walk(Node node) {
-    System.out.print(node.enter);
+    if (node == null)
+      return;
+
+    code += node.enter;
     if (node.IsLeaf()) {
-      System.out.print(" " + node.data + " ");
+      code += " " + node.data + " ";
     }
     for (Node child : node.getChildren()) {
       walk(child);
     }
-    System.out.print(node.exit);
+    code += node.exit;
   }
 }

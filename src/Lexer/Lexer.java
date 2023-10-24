@@ -79,7 +79,6 @@ public class Lexer {
       Token token = proximoToken();
 
       while (!token.getTipo().equals("EOF")) {
-        System.out.println(token);
         tokens.add(token);
         token = proximoToken();
       }
