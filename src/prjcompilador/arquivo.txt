@@ -1,5 +1,6 @@
-fnc dec somaValores <dec a, txt b> {
-
+fnc somaValores <dec a, txt b> {
+  a -> a + 1
+  rtn a + b
 }
 
 

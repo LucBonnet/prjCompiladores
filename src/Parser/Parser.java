@@ -338,10 +338,12 @@ public class Parser {
 
     private void rtn(Node node) {
         if (Gramaticas.matchLex(token, "rtn")) {
+            node.enter = "return";
             token = getNextToken();
-            Node nodeId = new Node("id");
-            node.addChild(nodeId);
-            id(nodeId);
+            Node nodeExpressao = new Node("expressao");
+            node.addChild(nodeExpressao);
+            expressao(nodeExpressao);
+            node.exit = ";";
         }
     }
 
@@ -550,6 +552,8 @@ public class Parser {
                 Node nodetipo = new Node("tipo");
                 nodeFunc.addChild(nodetipo);
                 tipo(nodetipo);
+            } else {
+                nodeFunc.enter += "void";
             }
 
             // nome da função
