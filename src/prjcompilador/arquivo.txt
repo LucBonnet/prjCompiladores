@@ -1,8 +1,2 @@
-fnc somaValores <dec a, txt b> {
-  a -> a + 1
-  rtn a + b
-}
-
-
-a -> a + 10
-b -> b + 1
+cmt 
+a -> a + b

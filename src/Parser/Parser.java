@@ -480,6 +480,12 @@ public class Parser {
         }
     }
 
+    private void comentario() {
+        if (Gramaticas.matchTipo(token, "COMENTARIO")) {
+            token = getNextToken();
+        }
+    }
+
     private void prt(Node node) {
         if (Gramaticas.matchLex(token, "prt") || Gramaticas.matchLex(token, "prtln")) {
             if (Gramaticas.matchLex(token, "prt"))
@@ -636,6 +642,8 @@ public class Parser {
             Node newNode = new Node("ent");
             node.addChild(newNode);
             ent(newNode);
+        } else if (Gramaticas.matchTipo(token, "COMENTARIO")) {
+            comentario();
         } else {
             erro(token);
             return false;

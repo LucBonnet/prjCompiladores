@@ -60,6 +60,7 @@ public class Lexer {
 
       for (AFD afd : afds) {
         Token reconhecido = afd.processa(pos, texto);
+
         if (reconhecido != null) {
           reconhecido.setLinhaColuna(line, col);
           avancar(reconhecido.getLength());
