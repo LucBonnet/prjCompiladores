@@ -43,7 +43,7 @@ public class Parser {
 
     private void tipo(Node node) {
         String tipos[] = { "int", "dec", "txt", "lgc", "ltr", "lst" };
-        String tr[] = { "int", "float", "char[]", "boolean", "char", "String[]" };
+        String tr[] = { "int", "float", "String", "boolean", "char", "String[]" };
 
         int index = -1;
         for (int i = 0; i < tipos.length; i++) {
@@ -105,20 +105,31 @@ public class Parser {
 
     private void op(Node node) {
         String ops[] = { "*", "/", "rst", "^", "mnr", "mar", "equ", "mnri", "mari" };
-        Boolean reconhecido = false;
+        String tr[] = { "*", "/", "%", "^", "<", ">", "==", "<=", ">=" };
 
-        for (String op : ops) {
-            if (Gramaticas.matchLex(token, op)) {
-                reconhecido = true;
+        int index = -1;
+        for (int i = 0; i < ops.length; i++) {
+            if (Gramaticas.matchLex(token, ops[i])) {
+                index = i;
                 break;
             }
         }
 
-        if (reconhecido) {
-            node.data = token.lexema;
+        if (index > -1) {
+            node.data = tr[index];
             token = getNextToken();
         } else {
             erro(token);
+        }
+    }
+
+    private void opPow(Node nodeExp, Node node) {
+        if (Gramaticas.matchLex(token, "^")) {
+            token = getNextToken();
+            nodeExp.enter = "Math.pow(Double.parseDouble(";
+            Node newNode = new Node("),Double.parseDouble(");
+            node.addChild(newNode);
+            nodeExp.exit = "))";
         }
     }
 
@@ -169,19 +180,23 @@ public class Parser {
     }
 
     private void expressao(Node node) {
-        Node nodeTermo = new Node("termo");
-        node.addChild(nodeTermo);
-        termo(nodeTermo);
+        // TODO
+        // Node nodeTermo = new Node("termo");
+        // node.addChild(nodeTermo);
+        termo(node);
 
         expressaoL(node);
     }
 
     private void expressaoL(Node node) {
         if (Gramaticas.matchLex(token, "+") || Gramaticas.matchLex(token, "-")) {
+            Node nodeOperador = new Node(token.lexema);
+            node.addChild(nodeOperador);
+
             Node newNode = new Node("expressaoL");
             node.addChild(newNode);
-
             token = getNextToken();
+
             Node nodeTermo = new Node("termo");
             newNode.addChild(nodeTermo);
             termo(nodeTermo);
@@ -202,16 +217,23 @@ public class Parser {
 
     private void termoL(Node node) {
         if (Gramaticas.opL(token) || Gramaticas.opM(token)) {
-            Node newNode = new Node("");
+            Node newNode = new Node("termoL");
             node.addChild(newNode);
 
-            Node nodeOp = new Node("operador");
-            newNode.addChild(nodeOp);
-            op(nodeOp);
+            if (Gramaticas.matchLex(token, "^")) {
+                opPow(node, newNode);
+            } else {
+                Node nodeOp = new Node("operador");
+                newNode.addChild(nodeOp);
+                op(nodeOp);
+            }
 
             Node nodeFator = new Node("fator");
-            newNode.addChild(nodeFator);
+            node.addChild(nodeFator);
             fator(nodeFator);
+
+            System.out.println("-----------------");
+            System.out.println(nodeFator);
 
             Node nodeTermoL = new Node("");
             newNode.addChild(nodeTermoL);
@@ -381,105 +403,203 @@ public class Parser {
         }
     }
 
-    // private void whileMain() {
-    // if (Gramaticas.matchLex(token, "loop")) {
-    // token = getNextToken();
-    // compLexema("<");
-    // condicao();
-    // compLexema(">");
-    // bloco(false);
-    // }
-    // }
+    private void whileMain(Node node) {
+        if (Gramaticas.matchLex(token, "loop")) {
+            node.enter = "while";
+            token = getNextToken();
+            compLexema("<");
 
-    // private void forAtribuicaoDeclaracao() {
-    // if (Gramaticas.tipo(token)) {
-    // declaracao();
-    // } else if (Gramaticas.id(token)) {
-    // // atribuicao();
-    // // TODO NODE
-    // } else {
-    // erro(token);
-    // }
-    // }
+            Node nodeCond = new Node("condicao");
+            node.addChild(nodeCond);
+            condicao(nodeCond);
+            nodeCond.enter = "(";
+            nodeCond.exit = ")";
 
-    // private void forMain() {
-    // if (Gramaticas.matchLex(token, "looplim")) {
-    // token = getNextToken();
-    // compLexema("<");
-    // forAtribuicaoDeclaracao();
+            compLexema(">");
 
-    // if (Gramaticas.matchLex(token, "|")) {
-    // token = getNextToken();
-    // condicao();
-    // if (Gramaticas.matchLex(token, "|")) {
-    // token = getNextToken();
-    // // atribuicao();
-    // // TODO NODE
-    // compLexema(">");
-    // bloco(false);
-    // } else {
-    // erro(token);
-    // }
-    // } else {
-    // erro(token);
-    // }
-    // }
-    // }
+            Node nodeBloco = new Node("bloco");
+            node.addChild(nodeBloco);
+            bloco(nodeBloco, false);
+        }
+    }
 
-    // private void prt() {
-    // if (Gramaticas.matchLex(token, "prt")) {
-    // token = getNextToken();
-    // compLexema("<");
-    // expressao();
-    // compLexema(">");
-    // }
-    // }
+    private void forAtribuicaoDeclaracao(Node node) {
+        if (Gramaticas.tipo(token)) {
+            declaracao(node);
+        } else if (Gramaticas.id(token)) {
+            atribuicao(node);
+        } else {
+            erro(token);
+        }
+    }
 
-    // private void ent() {
-    // if (Gramaticas.matchLex(token, "ent")) {
-    // token = getNextToken();
-    // compLexema("<");
-    // if (Gramaticas.tipo(token)) {
-    // token = getNextToken();
-    // if (Gramaticas.matchLex(token, ",")) {
-    // token = getNextToken();
-    // id();
-    // compLexema(">");
-    // } else {
-    // erro(token);
-    // }
-    // } else {
-    // erro(token);
-    // }
-    // }
-    // }
+    private void forParametros(Node node) {
+        node.enter = "(";
+        forAtribuicaoDeclaracao(node);
 
-    // private void func() {
-    // if (Gramaticas.matchLex(token, "fnc")) {
-    // token = getNextToken();
+        if (Gramaticas.matchLex(token, "|")) {
+            token = getNextToken();
 
-    // tipo();
-    // compLexema("<");
+            Node nodeCondicao = new Node("condicao");
+            node.addChild(nodeCondicao);
+            condicao(nodeCondicao);
+            nodeCondicao.exit = ";";
 
-    // if (Gramaticas.tipo(token)) {
-    // token = getNextToken();
-    // id();
-    // while (!Gramaticas.matchLex(token, ">")) {
-    // compLexema(",");
-    // tipo();
-    // id();
-    // }
-    // compLexema(">");
-    // bloco(true);
-    // } else if (Gramaticas.matchLex(token, ">")) {
-    // compLexema(">");
-    // bloco(true);
-    // } else {
-    // erro(token);
-    // }
-    // }
+            if (Gramaticas.matchLex(token, "|")) {
+                token = getNextToken();
 
-    // }
+                Node nodeAtribuicao = new Node("atribuicao");
+                node.addChild(nodeAtribuicao);
+                atribuicao(nodeAtribuicao);
+
+                compLexema(">");
+                nodeAtribuicao.exit = ";";
+            } else {
+                erro(token);
+            }
+        } else {
+            erro(token);
+        }
+        node.exit = ")";
+    }
+
+    private void forMain(Node node) {
+        if (Gramaticas.matchLex(token, "looplim")) {
+            token = getNextToken();
+            compLexema("<");
+
+            Node nodeParametros = new Node(" parametros for");
+            node.addChild(nodeParametros);
+            forParametros(nodeParametros);
+
+            Node nodeBloco = new Node("bloco");
+            node.addChild(nodeBloco);
+            bloco(nodeBloco, false);
+        }
+    }
+
+    private void prt(Node node) {
+        if (Gramaticas.matchLex(token, "prt") || Gramaticas.matchLex(token, "prtln")) {
+            if (Gramaticas.matchLex(token, "prt"))
+                node.enter = "System.out.print(";
+            else
+                node.enter = "System.out.println(";
+
+            token = getNextToken();
+            compLexema("<");
+
+            Node nodeExpressao = new Node("expressao");
+            node.addChild(nodeExpressao);
+            expressao(nodeExpressao);
+
+            compLexema(">");
+            node.exit = ");";
+        }
+    }
+
+    private void ent(Node node) {
+        if (Gramaticas.matchLex(token, "ent")) {
+            node.enter = "Scanner sc" + token.linha + "" + token.coluna + " = new Scanner(System.in);";
+            token = getNextToken();
+            compLexema("<");
+            Node nodeTipo = new Node("tipo");
+            node.addChild(nodeTipo);
+            tipo(nodeTipo);
+
+            if (Gramaticas.matchLex(token, ",")) {
+                token = getNextToken();
+                Node nodeId = new Node("id");
+                node.addChild(nodeId);
+                id(nodeId);
+                compLexema(">");
+            } else {
+                erro(token);
+            }
+
+            node.exit = " = sc.next";
+
+            switch (nodeTipo.children.get(0).data) {
+                case "float":
+                    node.exit += "Float";
+                    break;
+                case "int":
+                    node.exit += "Int";
+                    break;
+                case "boolean":
+                    node.exit += "Boolean";
+                    break;
+                case "String":
+                    node.exit += "Line";
+                    break;
+            }
+
+            node.exit += "();";
+
+        }
+    }
+
+    private void func(Node node) {
+        if (Gramaticas.matchLex(token, "fnc")) {
+            Node nodeFunc = new Node("func");
+            token = getNextToken();
+            nodeFunc.enter = "public static ";
+            node.addChild(nodeFunc);
+
+            // tipo do retorno
+            if (Gramaticas.tipo(token)) {
+                Node nodetipo = new Node("tipo");
+                nodeFunc.addChild(nodetipo);
+                tipo(nodetipo);
+            }
+
+            // nome da função
+            Node nodeId = new Node("id");
+            nodeFunc.addChild(nodeId);
+            id(nodeId);
+
+            Node nodeParams = new Node("params");
+            nodeFunc.addChild(nodeParams);
+            compLexema("<");
+            nodeParams.enter = "(";
+
+            if (Gramaticas.tipo(token)) {
+                Node nodeTipoP = new Node("id");
+                nodeParams.addChild(nodeTipoP);
+                tipo(nodeTipoP);
+
+                Node nodeIdP = new Node("id");
+                nodeParams.addChild(nodeIdP);
+                id(nodeIdP);
+
+                while (!Gramaticas.matchLex(token, ">")) {
+                    compLexema(",");
+
+                    Node nodeTipoP2 = new Node("tipo");
+                    nodeTipoP2.enter = ",";
+                    nodeParams.addChild(nodeTipoP2);
+                    tipo(nodeTipoP2);
+                    Node nodeIdP2 = new Node("id");
+                    nodeParams.addChild(nodeIdP2);
+                    id(nodeIdP2);
+                }
+                compLexema(">");
+                nodeParams.exit = ")";
+
+                Node nodeBloco = new Node("");
+                nodeFunc.addChild(nodeBloco);
+                bloco(nodeBloco, true);
+            } else if (Gramaticas.matchLex(token, ">")) {
+                compLexema(">");
+                nodeParams.exit = ")";
+                Node nodeBloco = new Node("");
+                nodeFunc.addChild(nodeBloco);
+                bloco(nodeBloco, true);
+            } else {
+                erro(token);
+            }
+        }
+
+    }
 
     public Boolean instrucao(Node node) {
         if (Gramaticas.id(token)) {
@@ -496,14 +616,22 @@ public class Parser {
             Node newNode = new Node("if");
             node.addChild(newNode);
             ifMain(newNode);
-            // } else if (Gramaticas.matchLex(token, "loop")) {
-            // whileMain();
-            // } else if (Gramaticas.matchLex(token, "looplim")) {
-            // forMain();
-            // } else if (Gramaticas.matchLex(token, "prt")) {
-            // prt();
-            // } else if (Gramaticas.matchLex(token, "ent")) {
-            // ent();
+        } else if (Gramaticas.matchLex(token, "loop")) {
+            Node newNode = new Node("while");
+            node.addChild(newNode);
+            whileMain(newNode);
+        } else if (Gramaticas.matchLex(token, "looplim")) {
+            Node newNode = new Node("for");
+            node.addChild(newNode);
+            forMain(newNode);
+        } else if (Gramaticas.matchLex(token, "prt") || Gramaticas.matchLex(token, "prtln")) {
+            Node newNode = new Node("prt");
+            node.addChild(newNode);
+            prt(newNode);
+        } else if (Gramaticas.matchLex(token, "ent")) {
+            Node newNode = new Node("ent");
+            node.addChild(newNode);
+            ent(newNode);
         } else {
             erro(token);
             return false;
@@ -512,28 +640,34 @@ public class Parser {
         return true;
     }
 
-    public void code(Node node) {
+    public void code(Node nodeClass, Node nodeMain) {
         if (Gramaticas.matchLex(token, "fnc")) {
-            // func();
+            func(nodeClass);
         } else {
-            instrucao(node);
+            instrucao(nodeMain);
         }
 
         if (tokens.size() > 0) {
-            code(node);
+            code(nodeClass, nodeMain);
         }
     }
 
     public Tree main() {
-        Node node;
-        String mainEnter = "#include <stdlib.h>\n#include <stdio.h>\n\nint main() {\n";
-        String mainExit = "\nreturn 0;\n}";
-        node = new Node("main");
-        node.enter = mainEnter;
-        node.exit = mainExit;
-        tree = new Tree(node);
+        Node nodeRoot = new Node("root");
 
-        code(node);
+        Node nodeClass = new Node("classe");
+        nodeClass.enter = "class Main {\n";
+        nodeRoot.addChild(nodeClass);
+
+        Node nodeMain = new Node("main");
+        nodeMain.enter = "\npublic static void main (String args[]){\n";
+        nodeMain.exit = "\n}";
+        nodeRoot.addChild(nodeMain);
+
+        nodeRoot.exit = "\n}";
+        tree = new Tree(nodeRoot);
+
+        code(nodeClass, nodeMain);
 
         return tree;
     }

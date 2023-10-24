@@ -1,6 +1,7 @@
-? <a equ 10> {
-  a -> 10
-  b -> 20
-} & {
-  a -> 50
+fnc dec somaValores <dec a, txt b> {
+
 }
+
+
+a -> a + 10
+b -> b + 1
