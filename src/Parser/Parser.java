@@ -667,7 +667,7 @@ public class Parser {
     public Tree main() {
         Node nodeRoot = new Node("root");
 
-        Node nodeClass = new Node("classe");
+        Node nodeClass = new Node("");
         nodeClass.enter = "class Main {\n";
         nodeRoot.addChild(nodeClass);
 

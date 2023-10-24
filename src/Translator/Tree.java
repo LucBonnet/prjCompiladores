@@ -22,13 +22,6 @@ public class Tree {
     }
   }
 
-  // public void simpleWalk(Node node) {
-  // System.out.print(" " + node.data + " ");
-  // for (Node child : node.getChildren()) {
-  // simpleWalk(child);
-  // }
-  // }
-
   public void walk(Node node) {
     System.out.print(node.enter);
     if (node.IsLeaf()) {

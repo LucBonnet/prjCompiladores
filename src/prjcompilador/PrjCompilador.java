@@ -43,7 +43,6 @@ public class PrjCompilador {
         Tree tree = parser.main();
         tree.walk(tree.root);
 
-        System.out.println("\n");
         tree.print(tree.root);
 
         // Analaisador Semântico
