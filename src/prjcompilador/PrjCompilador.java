@@ -40,7 +40,7 @@ public class PrjCompilador {
         }
 
         // Analaisador Sintático
-        Parser parser = new Parser(tokens);
+        /*Parser parser = new Parser(tokens);
         Tree tree = parser.main();
         tree.walk(tree.root);
 
@@ -76,7 +76,7 @@ public class PrjCompilador {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 }

@@ -1,3 +1,1 @@
-looplim <int i -> 0 | i mnr 11 | i -> i + 1> {
-  prtln<i>
-}
+printli cbbvc

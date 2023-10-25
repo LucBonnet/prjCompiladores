@@ -3,29 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Compiladores/prjCompilador/src/prjcompilador/arquivo_1.txt</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResText.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Parser/Atribuicao.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResPrtln.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/Pow.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResPrt.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResLoopLim.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/prjcompilador/arquivo.txt</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResEnt.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/OpComEqu.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDPReservada.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/Char.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Parser/Parser.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResLogic.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResLoop.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/OpResto.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResLetra.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResTrue.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/prjcompilador/PrjCompilador.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFD.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Parser/IParser.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResFunc.java</file>
-            <file>file:/D:/Compiladores/prjCompilador/src/Lexer/AFDs/ResReturn.java</file>
+            <file>file:/D:/VICTOR/prjCompiladores/src/prjcompilador/arquivo.txt</file>
+            <file>file:/D:/VICTOR/prjCompiladores/src/Lexer/AFDPReservada.java</file>
+            <file>file:/D:/VICTOR/prjCompiladores/src/prjcompilador/PrjCompilador.java</file>
         </group>
     </open-files>
 </project-private>
