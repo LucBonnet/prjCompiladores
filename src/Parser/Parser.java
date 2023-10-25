@@ -810,7 +810,7 @@ public class Parser {
         nodeClass.enter = "import java.util.Scanner;\nclass Main {\n";
         nodeRoot.addChild(nodeClass);
 
-        Node nodeMain = new Node("main");
+        Node nodeMain = new Node("");
         nodeMain.enter = "\npublic static void main (String args[]){\n";
         nodeMain.exit = "\n}";
         nodeRoot.addChild(nodeMain);

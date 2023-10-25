@@ -1,2 +1,1 @@
-fnc dec soma<dec a, dec b>
-  rtn a + b
+printli cbbvc

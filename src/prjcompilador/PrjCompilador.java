@@ -40,46 +40,48 @@ public class PrjCompilador {
         }
 
         // Analaisador Sintático
-        Parser parser = new Parser(tokens);
-        Tree tree = parser.main();
-        tree.walk(tree.root);
-
-        tree.print(tree.root);
-        System.out.println("\n\n\n\n");
-        String code = tree.code;
-
-        System.out.println(code);
-
-        // Analaisador Semântico
-
-        // Execução
-        String pathFileOutput = System.getProperty("user.dir") + "./Main.java";
-        try {
-            FileWriter myWriter = new FileWriter(pathFileOutput);
-            myWriter.write(code);
-            myWriter.close();
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-
-        // try {
-        // Process proc = Runtime.getRuntime().exec("java Main.java");
-
-        // BufferedReader reader = new BufferedReader(new
-        // InputStreamReader(proc.getInputStream()));
-
-        // String linha = "";
-        // while ((linha = reader.readLine()) != null) {
-        // System.out.print(linha + "\n");
-        // }
-
-        // proc.waitFor();
-        // } catch (IOException e) {
-        // e.printStackTrace();
-        // } catch (InterruptedException e) {
-        // e.printStackTrace();
-        // }
+        /*
+         * Parser parser = new Parser(tokens);
+         * Tree tree = parser.main();
+         * tree.walk(tree.root);
+         * 
+         * tree.print(tree.root);
+         * System.out.println("\n\n\n\n");
+         * String code = tree.code;
+         * 
+         * System.out.println(code);
+         * 
+         * // Analaisador Semântico
+         * 
+         * // Execução
+         * String pathFileOutput = System.getProperty("user.dir") + "./Main.java";
+         * try {
+         * FileWriter myWriter = new FileWriter(pathFileOutput);
+         * myWriter.write(code);
+         * myWriter.close();
+         * } catch (IOException e) {
+         * System.out.println("An error occurred.");
+         * e.printStackTrace();
+         * }
+         * 
+         * // try {
+         * // Process proc = Runtime.getRuntime().exec("java Main.java");
+         * 
+         * // BufferedReader reader = new BufferedReader(new
+         * // InputStreamReader(proc.getInputStream()));
+         * 
+         * // String linha = "";
+         * // while ((linha = reader.readLine()) != null) {
+         * // System.out.print(linha + "\n");
+         * // }
+         * 
+         * proc.waitFor();
+         * } catch (IOException e) {
+         * e.printStackTrace();
+         * } catch (InterruptedException e) {
+         * e.printStackTrace();
+         * }
+         */
     }
 
 }
