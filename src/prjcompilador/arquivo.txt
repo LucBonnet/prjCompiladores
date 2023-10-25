@@ -1,3 +1,2 @@
-looplim <int i -> 0 | i mnr 11 | i -> i + 1> {
-  prtln<i>
-}
+fnc dec soma<dec a, dec b>
+  rtn a + b

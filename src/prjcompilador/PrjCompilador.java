@@ -48,6 +48,8 @@ public class PrjCompilador {
         System.out.println("\n\n\n\n");
         String code = tree.code;
 
+        System.out.println(code);
+
         // Analaisador Semântico
 
         // Execução
@@ -61,22 +63,23 @@ public class PrjCompilador {
             e.printStackTrace();
         }
 
-        try {
-            Process proc = Runtime.getRuntime().exec("java Main.java");
+        // try {
+        // Process proc = Runtime.getRuntime().exec("java Main.java");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        // BufferedReader reader = new BufferedReader(new
+        // InputStreamReader(proc.getInputStream()));
 
-            String linha = "";
-            while ((linha = reader.readLine()) != null) {
-                System.out.print(linha + "\n");
-            }
+        // String linha = "";
+        // while ((linha = reader.readLine()) != null) {
+        // System.out.print(linha + "\n");
+        // }
 
-            proc.waitFor();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // proc.waitFor();
+        // } catch (IOException e) {
+        // e.printStackTrace();
+        // } catch (InterruptedException e) {
+        // e.printStackTrace();
+        // }
     }
 
 }
