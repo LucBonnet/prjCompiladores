@@ -479,7 +479,7 @@ public class Parser {
         }
     }
 
-    private void bloco(Node node, boolean func) {
+    private void bloco(Node node) {
         if (matchL("{")) {
             Node bloco = new Node("bloco");
             node.addChild(bloco);
@@ -491,29 +491,17 @@ public class Parser {
             }
             System.out.println(token);
             while (!matchL("}")) {
-                if (matchL("rtn") && func) {
-                    Node nodeReturn = new Node("return");
-                    bloco.addChild(nodeReturn);
-                    rtn(nodeReturn);
-                } else {
-                    Node nodeInst = new Node("instrucao");
-                    bloco.addChild(nodeInst);
-                    instrucao(nodeInst);
-                }
+                Node nodeInst = new Node("instrucao");
+                bloco.addChild(nodeInst);
+                instrucao(nodeInst);
             }
 
             if (matchL("}")) {
                 getNextToken();
                 bloco.exit = "}";
             }
-        } else if (instrucao(node)) {
-
-        } else if (matchL("rtn") && func) {
-            Node bloco = new Node("bloco");
-            node.addChild(bloco);
-            rtn(bloco);
         } else {
-            erro();
+            instrucao(node);
         }
     }
 
@@ -525,7 +513,7 @@ public class Parser {
 
             getNextToken();
 
-            bloco(elseN, false);
+            bloco(elseN);
         }
     }
 
@@ -542,7 +530,7 @@ public class Parser {
             if (matchL(">")) {
                 condicao.exit = ")";
                 getNextToken();
-                bloco(node, false);
+                bloco(node);
                 elseM(node);
             } else {
                 erro();
@@ -567,7 +555,7 @@ public class Parser {
 
                 Node bloco = new Node("bloco");
                 node.addChild(bloco);
-                bloco(bloco, false);
+                bloco(bloco);
             } else {
                 erro();
             }
@@ -634,7 +622,7 @@ public class Parser {
 
             Node nodeBloco = new Node("bloco");
             node.addChild(nodeBloco);
-            bloco(nodeBloco, false);
+            bloco(nodeBloco);
         } else {
             erro();
         }
@@ -658,15 +646,21 @@ public class Parser {
             if (matchL("<")) {
                 getNextToken();
 
-                Node nodeExpressao = new Node("expressao");
-                node.addChild(nodeExpressao);
-                expressao(nodeExpressao);
-
                 if (matchL(">")) {
                     getNextToken();
-                    node.exit = ");";
+                    node.data = "";
+                    node.exit = "\"\");";
                 } else {
-                    erro();
+                    Node nodeExpressao = new Node("expressao");
+                    node.addChild(nodeExpressao);
+                    expressao(nodeExpressao);
+
+                    if (matchL(">")) {
+                        getNextToken();
+                        node.exit = ");";
+                    } else {
+                        erro();
+                    }
                 }
             } else {
                 erro();
@@ -785,7 +779,7 @@ public class Parser {
 
                     Node nodeBloco = new Node("");
                     nodeFunc.addChild(nodeBloco);
-                    bloco(nodeBloco, true);
+                    bloco(nodeBloco);
                 } else {
                     erro();
                 }
@@ -794,7 +788,7 @@ public class Parser {
                 nodeParams.exit = ")";
                 Node nodeBloco = new Node("");
                 nodeFunc.addChild(nodeBloco);
-                bloco(nodeBloco, true);
+                bloco(nodeBloco);
             } else {
                 erro();
             }
@@ -874,29 +868,35 @@ public class Parser {
             Node newNode = new Node("if");
             node.addChild(newNode);
             ifM(newNode);
-        } else if (Gramaticas.matchLex(token, "loop")) {
+        } else if (matchL("loop")) {
             erro = false;
             Node newNode = new Node("while");
             node.addChild(newNode);
             whileM(newNode);
-        } else if (Gramaticas.matchLex(token, "looplim")) {
+        } else if (matchL("looplim")) {
             erro = false;
             Node newNode = new Node("for");
             node.addChild(newNode);
             forM(newNode);
-        } else if (Gramaticas.matchLex(token, "prt") || Gramaticas.matchLex(token, "prtln")) {
+        } else if (matchL("prt") || matchL("prtln")) {
             erro = false;
             Node newNode = new Node("prt");
             node.addChild(newNode);
             prt(newNode);
-        } else if (Gramaticas.matchLex(token, "ent")) {
+        } else if (matchL("ent")) {
             erro = false;
             Node newNode = new Node("ent");
             node.addChild(newNode);
             ent(newNode);
-        } else if (Gramaticas.matchTipo(token, "COMENTARIO")) {
+        } else if (matchT("COMENTARIO")) {
             comentario();
+        } else if (matchL("rtn")) {
+            erro = false;
+            Node newNode = new Node("rtn");
+            node.addChild(newNode);
+            rtn(newNode);
         } else {
+            node.data = "";
             erro();
             return false;
         }
@@ -935,9 +935,9 @@ public class Parser {
 
         tree = new Tree(nodeRoot);
 
-        // if (erro) {
-        // tree.root = null;
-        // }
+        if (erro) {
+            tree.root = null;
+        }
 
         return tree;
     }

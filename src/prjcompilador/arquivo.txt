@@ -1,2 +1,13 @@
+fnc int fatorial<int num> {
+  ? <num equ 1> {
+    rtn 1
+  }
 
-prt<fatorial<10>>
+  rtn num * fatorial<num-1>
+}
+
+prt<"Digite um numero: ">
+ent<int, num>
+
+prtln<>
+prtln<"Fatorial de " + num + ": " + fatorial<num>>
