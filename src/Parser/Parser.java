@@ -161,6 +161,7 @@ public class Parser {
     }
 
     private void id(Node node) {
+        System.out.println(token);
         if (matchT("ID")) {
             Node id = new Node(token.lexema);
             node.addChild(id);
@@ -355,14 +356,62 @@ public class Parser {
         expressaoL(expressao);
     }
 
-    public void atribuicao(Node node) {
-        idFator(node);
-        if (matchL("->")) {
+    public void atribuicao(Node node, Node nodeId) {
+        if (nodeId == null) {
+            Node id = new Node("id");
+            node.addChild(id);
+            idFator(nodeId);
+
+            if (matchL("->")) {
+                Node op = new Node("=");
+                node.addChild(op);
+                getNextToken();
+
+                expressao(node);
+            } else {
+                erro();
+            }
+        } else if (matchL("->")) {
             Node op = new Node("=");
             node.addChild(op);
             getNextToken();
 
-            expressao(node);
+            Token temp = token;
+            if (tokens.size() > 0)
+                token = tokens.get(0);
+
+            if (matchL("<")) {
+                token = temp;
+
+                Node nodeIdF = new Node("id");
+                node.addChild(nodeIdF);
+                id(nodeIdF);
+
+                chamadaFuncao(node);
+            } else {
+                token = temp;
+                if (matchId() || matchValor() || matchL("(")) {
+                    token = temp;
+
+                    Node expressao = new Node("expressao");
+                    node.addChild(expressao);
+                    expressao(expressao);
+                } else {
+                    erro();
+                }
+            }
+        } else if (matchL("[")) {
+            idLista(nodeId);
+
+            if (matchL("->")) {
+                Node op = new Node("=");
+                node.addChild(op);
+                getNextToken();
+
+                expressao(node);
+            } else {
+                erro();
+            }
         } else {
             erro();
         }
@@ -522,7 +571,7 @@ public class Parser {
         if (matchTipo()) {
             declaracao(node);
         } else if (matchId()) {
-            atribuicao(node);
+            atribuicao(node, null);
         } else {
             erro();
         }
@@ -548,7 +597,7 @@ public class Parser {
 
                 Node nodeAtribuicao = new Node("atribuicao");
                 node.addChild(nodeAtribuicao);
-                atribuicao(nodeAtribuicao);
+                atribuicao(nodeAtribuicao, null);
 
                 if (matchL(">")) {
                     getNextToken();
@@ -746,11 +795,67 @@ public class Parser {
         }
     }
 
+    public void chamadaFuncao(Node node) {
+        System.out.println(token);
+        if (matchL("<")) {
+            getNextToken();
+            Node param = new Node("params");
+            node.addChild(param);
+            param.enter = "(";
+
+            if (matchL(">")) {
+                param.data = ")";
+            } else {
+                Node nodeP = new Node("param" + 1);
+                param.addChild(nodeP);
+                expressao(nodeP);
+
+                int i = 2;
+                while (!matchL(">")) {
+                    if (matchL(",")) {
+                        getNextToken();
+                    } else {
+                        break;
+                    }
+
+                    Node nodeP2 = new Node("param" + i);
+                    param.addChild(nodeP2);
+                    nodeP2.enter = ",";
+                    expressao(nodeP2);
+                    i++;
+                }
+
+                if (matchL(">")) {
+                    getNextToken();
+                    param.exit = ")";
+                } else {
+                    erro();
+                }
+            }
+        } else {
+            erro();
+        }
+    }
+
     public Boolean instrucao(Node node) {
         if (matchId()) {
-            Node newNode = new Node("atribuicao");
+            Node newNode = new Node(""); // atribuicao ou chamada de funcao
             node.addChild(newNode);
-            atribuicao(newNode);
+
+            Node nodeId = new Node("id");
+            newNode.addChild(nodeId);
+            id(nodeId);
+
+            if (matchL("->") || matchL("[")) {
+                newNode.data = "atribuicao";
+                atribuicao(newNode, nodeId);
+            } else if (matchL("<")) {
+                newNode.data = "chamada funcao";
+                chamadaFuncao(newNode);
+            } else {
+                erro();
+            }
+
             newNode.exit += ";\n";
         } else if (matchTipo()) {
             Node newNode = new Node("declaracao");

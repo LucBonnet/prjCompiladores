@@ -1,1 +1,1 @@
-printli cbbvc
+a -> soma<a, 10>
