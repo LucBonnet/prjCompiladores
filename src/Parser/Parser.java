@@ -548,9 +548,11 @@ public class Parser {
 
             Node condicao = new Node("condicao");
             node.addChild(condicao);
+            condicao.enter = "(";
             condicao(condicao);
 
             if (matchL(">")) {
+                condicao.exit = ")";
                 getNextToken();
 
                 Node bloco = new Node("bloco");

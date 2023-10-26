@@ -1,13 +1,9 @@
-fnc int fatorial<int num> {
-  ? <num equ 1> {
-    rtn 1
-  }
+int a -> 10
+int b -> 15
 
-  rtn num * fatorial<num-1>
-}
+?<a mnr 15>
+  loop<b mari 10>
+    b -> b-1
 
-prt<"Digite um numero: ">
-ent<int, num>
-
-prtln<>
-prtln<"Fatorial de " + num + ": " + fatorial<num>>
+a -> a + 1
+prt<a>
