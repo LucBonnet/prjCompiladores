@@ -21,32 +21,23 @@ public class AFDPReservada {
     }
 
     public Boolean processa(int pos, String texto) {
-        if(palavra.charAt(palavra.length()-1) == texto.charAt(palavra.length()-1)){
-            this.pos = pos;
+        this.pos = pos;
         this.atual = texto.charAt(pos);
         this.cont = 0;
 
         while (this.atual != '@') {
-            if (cont >= palavra.length() -1) {
-                avancar(texto);
-                if (Character.isDigit(this.atual) || Character.isAlphabetic(this.atual)) {
-                    return false;
-                }
+            if (cont > palavra.length() - 1) {
                 return true;
             }
-            
+
             if (this.atual != this.palavra.charAt(cont)) {
                 return false;
-            }            
+            }
             cont++;
-            avancar(texto); 
-            
+            avancar(texto);
+
         }
 
         return true;
     }
-        
-       return false;
-        
-    } 
 }

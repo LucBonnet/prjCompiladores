@@ -1,8 +1,9 @@
 import java.util.Scanner;
 class Main {
-  
+public static  int  fatorial ( int  num ){return num  *  fatorial ( n - 1 );
+}
 public static void main (String args[]){
- double  a  =  soma ( a , b );
+ prt ( fatorial ( 3 ));
 
 }
 }

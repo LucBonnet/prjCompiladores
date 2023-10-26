@@ -53,6 +53,8 @@ public class PrjCompilador {
 
         // Analaisador Semântico
 
+        // TODO
+
         // Criação do arquivo Main.java
         String pathFileOutput = System.getProperty("user.dir") + "./Main.java";
         try {

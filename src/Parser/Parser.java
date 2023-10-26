@@ -647,7 +647,6 @@ public class Parser {
     }
 
     private void prt(Node node) {
-        System.out.println(token);
         if (matchL("prt") || matchL("prtln")) {
             if (matchL("prt"))
                 node.enter = "System.out.print(";
