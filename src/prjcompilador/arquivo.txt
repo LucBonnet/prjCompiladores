@@ -1,1 +1,1 @@
-a -> soma<a, 10>
+dec a -> soma<a, b>

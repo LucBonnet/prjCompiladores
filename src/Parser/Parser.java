@@ -283,12 +283,19 @@ public class Parser {
     }
 
     public void fator(Node node) {
-        System.out.println(token);
-        Node fator = new Node("");
+        Node fator = new Node("fator");
         node.addChild(fator);
 
-        if (matchT("ID") || matchL("[")) {
-            idFator(fator);
+        if (matchT("ID")) {
+            Node nodeId = new Node("id");
+            fator.addChild(nodeId);
+            id(nodeId);
+
+            if (matchL("<")) {
+                chamadaFuncao(nodeId);
+            } else {
+                idLista(nodeId);
+            }
         } else if (matchValor()) {
             valor(fator);
         } else if (matchL("(")) {
@@ -376,30 +383,32 @@ public class Parser {
             node.addChild(op);
             getNextToken();
 
-            Token temp = token;
-            if (tokens.size() > 0)
-                token = tokens.get(0);
+            expressao(node);
 
-            if (matchL("<")) {
-                token = temp;
+            // Token temp = token;
+            // if (tokens.size() > 0)
+            // token = tokens.get(0);
 
-                Node nodeIdF = new Node("id");
-                node.addChild(nodeIdF);
-                id(nodeIdF);
+            // if (matchL("<")) {
+            // token = temp;
 
-                chamadaFuncao(node);
-            } else {
-                token = temp;
-                if (matchId() || matchValor() || matchL("(")) {
-                    token = temp;
+            // Node nodeIdF = new Node("id");
+            // node.addChild(nodeIdF);
+            // id(nodeIdF);
 
-                    Node expressao = new Node("expressao");
-                    node.addChild(expressao);
-                    expressao(expressao);
-                } else {
-                    erro();
-                }
-            }
+            // chamadaFuncao(node);
+            // } else {
+            // token = temp;
+            // if (matchId() || matchValor() || matchL("(")) {
+            // token = temp;
+
+            // Node expressao = new Node("expressao");
+            // node.addChild(expressao);
+            // expressao(expressao);
+            // } else {
+            // erro();
+            // }
+            // }
         } else if (matchL("[")) {
             idLista(nodeId);
 
