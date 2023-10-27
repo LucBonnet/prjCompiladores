@@ -1,1 +1,3 @@
-printli cbbvc
+fnc dec soma<dec a> {
+    a -> 10
+}

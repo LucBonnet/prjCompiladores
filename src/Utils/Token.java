@@ -5,6 +5,10 @@ public class Token {
   public String lexema;
   public int linha;
   public int coluna;
+  
+  public Token() {
+      
+  }
 
   public Token(String tipo, String lexema) {
     this.tipo = tipo;

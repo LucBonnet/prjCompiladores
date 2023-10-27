@@ -11,6 +11,8 @@ import Lexer.Lexer;
 import Parser.Parser;
 import Translator.Tree;
 import Utils.Token;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PrjCompilador {
 
@@ -27,6 +29,11 @@ public class PrjCompilador {
             System.out.println("Erro ao ler o arquivo");
             System.out.println(exception);
         }
+        
+        if(texto.equals("")) {
+            System.out.println("Arquivo vazio");
+            return;
+        }
 
         List<Token> tokens = new ArrayList<>();
 
@@ -34,12 +41,12 @@ public class PrjCompilador {
         Lexer lexer = new Lexer(texto);
         tokens = lexer.getTokens();
 
-        for (Token token : tokens) {
-            System.out.println(token);
-        }
+//        for (Token token : tokens) {
+//            System.out.println(token);
+//        }
 
+        
         // Analaisador Sintático
-
         Parser parser = new Parser(tokens);
         Tree tree = parser.main();
         tree.walk(tree.root);
@@ -51,9 +58,8 @@ public class PrjCompilador {
         System.out.println(code);
 
         // Analaisador Semântico
-
         // TODO
-
+        
         // Criação do arquivo Main.java
         String pathFileOutput = System.getProperty("user.dir") + "./Main.java";
         try {
@@ -65,25 +71,18 @@ public class PrjCompilador {
             e.printStackTrace();
         }
 
-        // Execução do código
-        // try {
-        // Process proc = Runtime.getRuntime().exec("java Main.java");
-
-        // BufferedReader reader = new BufferedReader(new
-        // InputStreamReader(proc.getInputStream()));
-
-        // String linha = "";
-        // while ((linha = reader.readLine()) != null) {
-        // System.out.print(linha + "\n");
-        // }
-
-        // proc.waitFor();
-        // } catch (IOException e) {
-        // e.printStackTrace();
-        // } catch (InterruptedException e) {
-        // e.printStackTrace();
-        // }
-
+        ProcessBuilder processBuilder = new ProcessBuilder("java", "Main");
+        Process process;
+        try {
+            process = processBuilder.start();
+            int exitCode = process.waitFor();
+            System.out.println("O processo terminou com código de saída " + exitCode);
+        } catch (IOException ex) {
+            System.out.println(ex);
+        } catch (InterruptedException ex) {
+            System.out.println(ex);
+        }
+        
     }
 
 }

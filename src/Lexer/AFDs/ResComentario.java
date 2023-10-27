@@ -13,17 +13,18 @@ public class ResComentario implements AFD {
     public String getComentario(String texto) {
 
         String result = palavra;
-            while (this.atual != '@' && (Character.isDigit(this.atual) || Character.isAlphabetic(this.atual) || this.atual == ' ')) {
-                result += this.atual;
-                avancar(texto);
+        int asciiAtual = this.atual;
+        while (this.atual != '\n' && (asciiAtual >= 32 && asciiAtual <= 126)) {
+            result += this.atual;
+            asciiAtual = this.atual;
+            avancar(texto);
 
-                AFDPReservada afdpReservada = new AFDPReservada(palavra);
-                if (afdpReservada.processa(pos, texto)) {
-                    break;
-                }
+            AFDPReservada afdpReservada = new AFDPReservada(palavra);
+            if (afdpReservada.processa(pos, texto)) {
+                break;
             }
-            return result;
-      
+        }
+        return result;
 
     }
 
@@ -53,7 +54,7 @@ public class ResComentario implements AFD {
 
             String comentario = getComentario(texto);
 
-                return new Token("COMENTARIO", comentario);           
+            return new Token("COMENTARIO", comentario);
         }
         return null;
     }

@@ -34,6 +34,10 @@ public class Node {
   public List<Node> getChildren() {
     return children;
   }
+  
+  public Node getChild(int i) {
+    return this.getChildren().get(i);
+  }
 
   public boolean IsLeaf() {
     return children.size() == 0;
