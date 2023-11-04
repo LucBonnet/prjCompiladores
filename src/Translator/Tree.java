@@ -28,7 +28,7 @@ public class Tree {
     }
   }
 
-  public void walk(Node node) {
+  public void walkPrint(Node node) {
     if (node == null)
       return;
 
@@ -37,7 +37,7 @@ public class Tree {
       code += " " + node.data + " ";
     }
     for (Node child : node.getChildren()) {
-      walk(child);
+      walkPrint(child);
     }
     code += node.exit;
   }

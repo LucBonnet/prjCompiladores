@@ -1,12 +1,10 @@
 package Semantico;
 
-
-import Semantico.IdHash;
 import Translator.Node;
 import Utils.Token;
 
 public class Utils {
-    public static String addHash(Node nodeTipo, Node nodeId, IdHash hash, Token tk){
+    public static String addHash(Node nodeTipo, Node nodeId, IdHash hash, Token tk) {
         String strTipo = "";
         Node temp = nodeTipo;
         while (temp.getChildren().size() > 0) {

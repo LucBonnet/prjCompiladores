@@ -1,3 +1,3 @@
-fnc dec soma<dec a> {
-    a -> 10
-}
+fnc int soma<int b, int c>{}
+
+int soma<10, 3> -> 10

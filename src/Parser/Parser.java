@@ -109,7 +109,7 @@ public class Parser {
     }
 
     public Boolean matchTipo() {
-        String tipos[] = {"int", "dec", "txt", "lgc", "ltr"};
+        String tipos[] = { "int", "dec", "txt", "lgc", "ltr" };
 
         for (String tipo : tipos) {
             if (matchL(tipo)) {
@@ -121,7 +121,7 @@ public class Parser {
     }
 
     public Boolean matchValor() {
-        String valores[] = {"INT", "DEC", "TEXT", "RES_FLS", "RES_VER", "CHAR"};
+        String valores[] = { "INT", "DEC", "TEXT", "RES_FLS", "RES_VER", "CHAR" };
 
         for (String valor : valores) {
             if (matchT(valor)) {
@@ -133,7 +133,7 @@ public class Parser {
     }
 
     public Boolean matchOpT() {
-        String opTs[] = {"^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari"};
+        String opTs[] = { "^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari" };
 
         for (String op : opTs) {
             if (matchL(op)) {
@@ -153,8 +153,8 @@ public class Parser {
     }
 
     private void tipo(Node node) {
-        String tipos[] = {"dec", "int", "txt", "lgc", "ltr"};
-        String tr[] = {"double", "int", "String", "boolean", "char"};
+        String tipos[] = { "dec", "int", "txt", "lgc", "ltr" };
+        String tr[] = { "double", "int", "String", "boolean", "char" };
 
         int index = -1;
         for (int i = 0; i < tipos.length; i++) {
@@ -174,7 +174,7 @@ public class Parser {
     }
 
     private void valor(Node node) {
-        String valores[] = {"INT", "DEC", "TEXT", "RES_FLS", "RES_VER", "CHAR"};
+        String valores[] = { "INT", "DEC", "TEXT", "RES_FLS", "RES_VER", "CHAR" };
         Boolean reconhecido = false;
 
         for (String valor : valores) {
@@ -200,6 +200,7 @@ public class Parser {
     }
 
     private void id(Node node, boolean isDec) {
+
         if (matchT("ID")) {
             if (!isDec) {
                 if (!hash.itemExists(token.lexema)) {
@@ -305,8 +306,8 @@ public class Parser {
     }
 
     public void opT(Node node) {
-        String opTs[] = {"^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari"};
-        String tr[] = {"^", "*", "%", "/", "<", ">", "==", "<=", ">="};
+        String opTs[] = { "^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari" };
+        String tr[] = { "^", "*", "%", "/", "<", ">", "==", "<=", ">=" };
 
         int index = -1;
         for (int i = 0; i < opTs.length; i++) {
@@ -346,7 +347,7 @@ public class Parser {
 
             Node expressao = new Node("expressao");
             expressao.enter = "(";
-            node.addChild(expressao);
+            fator.addChild(expressao);
 
             expressao(expressao);
             if (matchL(")")) {
@@ -355,6 +356,30 @@ public class Parser {
             } else {
                 erro();
             }
+        } else if (matchL("[")) {
+            getNextToken();
+
+            Node expressao = new Node("expressao");
+            expressao.enter = "{";
+            fator.addChild(expressao);
+            expressao(expressao);
+
+            while (matchL(",")) {
+                getNextToken();
+
+                Node expressao1 = new Node("expressao");
+                expressao1.enter = ",";
+                fator.addChild(expressao1);
+                expressao(expressao1);
+            }
+
+            if (matchL("]")) {
+                fator.exit = "}";
+                getNextToken();
+            } else {
+                erro();
+            }
+
         } else {
             erro();
         }
@@ -398,12 +423,8 @@ public class Parser {
     }
 
     public void expressao(Node node) {
-
-        Node expressao = new Node("expressao");
-        node.addChild(expressao);
-
-        termo(expressao);
-        expressaoL(expressao);
+        termo(node);
+        expressaoL(node);
     }
 
     public void atribuicao(Node node, Node nodeId) {
@@ -458,34 +479,21 @@ public class Parser {
         if ((r = (Utils.addHash(nodeTipo, nodeId, hash, tk))) != null) {
             erro(r, tk);
         }
-
-    }
-
-    private void opL(Node node) {
-        String opLs[] = {"mnr", "mar", "equ", "mnri", "mari"};
-        String tr[] = {"<", ">", "==", "<=", ">="};
-
-        int index = -1;
-        for (int i = 0; i < opLs.length; i++) {
-            if (matchL(opLs[i])) {
-                index = i;
-                break;
-            }
-        }
-
-        if (index > -1) {
-            Node op = new Node(tr[index]);
-            node.addChild(op);
-            getNextToken();
-        } else {
-            erro();
-        }
     }
 
     private void condicao(Node node) {
-        Node expressao1 = new Node("expressao");
-        node.addChild(expressao1);
-        expressao(expressao1);
+        Node expressao = new Node("expressao");
+        node.addChild(expressao);
+        expressao(expressao);
+
+        int controle = expressao.IsString();
+        if (controle > 0) {
+            node.enter += "Boolean.parseBoolean(";
+            node.exit += ")";
+        } else if (controle == 0) {
+            node.enter += "(";
+            node.exit += ") == 0 ? false : true";
+        }
     }
 
     private void rtn(Node node) {
@@ -542,12 +550,12 @@ public class Parser {
         if (matchL("<")) {
             getNextToken();
             Node condicao = new Node("condicao");
-            condicao.enter = "(";
+            condicao.enter += "(";
             node.addChild(condicao);
             condicao(condicao);
 
             if (matchL(">")) {
-                condicao.exit = ")";
+                condicao.exit += ")";
                 getNextToken();
                 bloco(node);
                 elseM(node);
@@ -708,7 +716,7 @@ public class Parser {
                     getNextToken();
                     Node nodeId = new Node("id");
                     node.addChild(nodeId);
-                    id(nodeId, true);
+                    idFator(nodeId);
                     if (matchL(">")) {
                         getNextToken();
                     } else {
@@ -968,7 +976,7 @@ public class Parser {
         } else {
             instrucao(nodeMain);
             if (!nodeMain.IsLeaf()) {
-                nodeMain.data = "main escopo";
+                nodeMain.data = "main";
             }
         }
 
@@ -978,7 +986,7 @@ public class Parser {
     }
 
     public Tree main() {
-        Node nodeRoot = new Node("root");
+        Node nodeRoot = new Node("programa");
 
         Node nodeClass = new Node("");
         nodeClass.enter = "import java.util.Scanner;\nclass Main {\n";

@@ -11,12 +11,11 @@ import Lexer.Lexer;
 import Parser.Parser;
 import Translator.Tree;
 import Utils.Token;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PrjCompilador {
 
     public static void main(String[] args) {
+
         // Leitura do arquivo
         String texto = "";
         String pathFile = System.getProperty("user.dir") + "/src/prjcompilador/arquivo.txt";
@@ -29,8 +28,8 @@ public class PrjCompilador {
             System.out.println("Erro ao ler o arquivo");
             System.out.println(exception);
         }
-        
-        if(texto.equals("")) {
+
+        if (texto.equals("")) {
             System.out.println("Arquivo vazio");
             return;
         }
@@ -41,15 +40,14 @@ public class PrjCompilador {
         Lexer lexer = new Lexer(texto);
         tokens = lexer.getTokens();
 
-//        for (Token token : tokens) {
-//            System.out.println(token);
-//        }
+        // for (Token token : tokens) {
+        // System.out.println(token);
+        // }
 
-        
         // Analaisador Sintático
         Parser parser = new Parser(tokens);
         Tree tree = parser.main();
-        tree.walk(tree.root);
+        tree.walkPrint(tree.root);
 
         tree.print(tree.root);
         System.out.println("\n\n\n\n");
@@ -59,7 +57,7 @@ public class PrjCompilador {
 
         // Analaisador Semântico
         // TODO
-        
+
         // Criação do arquivo Main.java
         String pathFileOutput = System.getProperty("user.dir") + "./Main.java";
         try {
@@ -82,7 +80,5 @@ public class PrjCompilador {
         } catch (InterruptedException ex) {
             System.out.println(ex);
         }
-        
     }
-
 }

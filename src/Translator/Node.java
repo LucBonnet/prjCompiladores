@@ -34,12 +34,42 @@ public class Node {
   public List<Node> getChildren() {
     return children;
   }
-  
+
   public Node getChild(int i) {
     return this.getChildren().get(i);
   }
 
   public boolean IsLeaf() {
     return children.size() == 0;
+  }
+
+  private int c = 0;
+
+  public int IsString() {
+    c = 0;
+    walk(this);
+
+    return c;
+  }
+
+  public void walk(Node node) {
+    if (node.IsLeaf()) {
+      if (node.data.contains('"' + "")) {
+        if (c != -1)
+          c++;
+      }
+
+      String ops[] = { "==", ">", "<", ">=", "<=" };
+      for (String op : ops) {
+        if (node.data.equals(op)) {
+          c = -1;
+          break;
+        }
+      }
+    }
+
+    for (Node child : node.getChildren()) {
+      walk(child);
+    }
   }
 }
