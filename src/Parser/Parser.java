@@ -202,12 +202,16 @@ public class Parser {
         }
     }
 
-    private void id(Node node, boolean isDec) {
+    private void id(Node node, boolean isDec, boolean isAtrib) {
 
         if (matchT("ID")) {
             if (!isDec) {
                 if (!hash.itemExists(token.lexema)) {
                     erro("Variável \"" + token.lexema + "\" não declarada", token);
+                } else if (!isAtrib) {
+                    if (!hash.getItem(token.lexema).valor) {
+                        erro("Variável \"" + token.lexema + "\" não instanciada", token);
+                    }
                 }
             }
 
@@ -223,7 +227,7 @@ public class Parser {
     private void idDec(Node node) {
         Node idDeclaracao = new Node("idDeclaracao");
         node.addChild(idDeclaracao);
-        id(idDeclaracao, true);
+        id(idDeclaracao, true, true);
 
         if (matchL("[")) {
             getNextToken();
@@ -261,7 +265,7 @@ public class Parser {
 
     public void idFator(Node node) {
         if (matchId()) {
-            id(node, false);
+            id(node, false, true);
             if (matchL("[")) {
                 idLista(node);
             }
@@ -324,7 +328,7 @@ public class Parser {
             Node op = new Node(tr[index]);
             if (tr[index].equals("==")) {
                 Node id = node.getFirstLeaf(node);
-                String tipo = hash.getItem(id.data);
+                String tipo = hash.getItem(id.data).tipo;
                 if (tipo == "String" || id.data.contains('"' + "")) {
                     node.enter = "(" + node.enter;
                     op.data = ").equals(";
@@ -332,6 +336,7 @@ public class Parser {
                 }
             }
             node.addChild(op);
+            op.token = token;
             getNextToken();
         } else {
             erro();
@@ -342,11 +347,11 @@ public class Parser {
     public void fator(Node node) {
         Node fator = new Node("fator");
         node.addChild(fator);
-
+        System.out.println(token);
         if (matchT("ID")) {
             Node nodeId = new Node("id");
             fator.addChild(nodeId);
-            id(nodeId, false);
+            id(nodeId, false, false);
 
             if (matchL("<")) {
                 chamadaFuncao(nodeId);
@@ -504,6 +509,18 @@ public class Parser {
                 }
                 break;
             }
+            case "opL": {
+                for (Token termo : termos) {
+                    if (termo.lexema.equals("equ") ||
+                            termo.lexema.equals("mnr") ||
+                            termo.lexema.equals("mar") ||
+                            termo.lexema.equals("mari") ||
+                            termo.lexema.equals("mnri")) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
 
         return true;
@@ -527,11 +544,13 @@ public class Parser {
                 ArrayList<Token> termos = new ArrayList<>();
                 expressao.getLeafs(termos);
 
-                String tipo = hash.getItem(id.getFirstLeaf(nodeId).data);
+                String tipo = hash.getItem(id.getFirstLeaf(id).data).tipo;
 
                 if (!verTipoDeclaracao(termos, tipo)) {
                     erro("Tipagem incorreta", termos.get(0));
                 }
+
+                hash.getItem(id.getFirstLeaf(id).data).valor = true;
             } else {
                 erro();
             }
@@ -540,7 +559,7 @@ public class Parser {
             node.addChild(op);
             getNextToken();
 
-            String tipo = hash.getItem(nodeId.getFirstLeaf(nodeId).data);
+            String tipo = hash.getItem(nodeId.getFirstLeaf(nodeId).data).tipo;
 
             if (!matchL("["))
                 op.exit += "(" + tipo + ")";
@@ -555,6 +574,8 @@ public class Parser {
             if (!verTipoDeclaracao(termos, tipo)) {
                 erro("Tipagem incorreta", termos.get(0));
             }
+
+            hash.getItem(nodeId.getFirstLeaf(nodeId).data).valor = true;
         } else if (matchL("[")) {
             idLista(nodeId);
 
@@ -564,6 +585,8 @@ public class Parser {
                 getNextToken();
 
                 expressao(node);
+
+                hash.getItem(nodeId.getFirstLeaf(nodeId).data).valor = true;
             } else {
                 erro();
             }
@@ -579,7 +602,7 @@ public class Parser {
         node.addChild(nodeId);
         idDec(nodeId);
 
-        Token tk = Utils.addHash(nodeTipo, nodeId, hash);
+        Token tk = Utils.addHash(nodeTipo, nodeId, hash, false);
         if (tk != null) {
             erro("Variável \"" + tk.lexema + "\" já declarada", tk);
         }
@@ -594,15 +617,31 @@ public class Parser {
     private void condicao(Node node) {
         Node expressao = new Node("expressao");
         node.addChild(expressao);
+        System.out.println(token);
         expressao(expressao);
 
-        int controle = expressao.IsString();
-        if (controle > 0) {
-            node.enter += "Boolean.parseBoolean(";
-            node.exit += ")";
-        } else if (controle == 0) {
+        // int controle = expressao.IsString();
+        // if (controle > 0) {
+        // node.enter += "Boolean.parseBoolean(";
+        // node.exit += ")";
+        // } else if (controle == 0) {
+        // node.enter += "(";
+        // node.exit += ") == 0 ? false : true";
+        // }
+
+        ArrayList<Token> termos = new ArrayList<>();
+        expressao.getLeafs(termos);
+        if (verTipoDeclaracao(termos, "opL")) {
+
+        } else if (verTipoDeclaracao(termos, "int") || verTipoDeclaracao(termos, "double")) {
             node.enter += "(";
             node.exit += ") == 0 ? false : true";
+        } else if (verTipoDeclaracao(termos, "String")) {
+            node.enter += "Boolean.parseBoolean(";
+            node.exit += ")";
+        } else if (verTipoDeclaracao(termos, "char")) {
+            node.enter += "Boolean.parseBoolean(";
+            node.exit += "+ \"\")";
         }
     }
 
@@ -828,7 +867,7 @@ public class Parser {
                     node.addChild(nodeId);
                     idDec(nodeId);
 
-                    Token tk = Utils.addHash(nodeTipo, nodeId, hash);
+                    Token tk = Utils.addHash(nodeTipo, nodeId, hash, true);
                     if (tk != null) {
                         erro("Variável \"" + tk.lexema + "\" já declarada", tk);
                     }
@@ -895,7 +934,7 @@ public class Parser {
         // nome da função
         Node nodeId = new Node("id");
         nodeFunc.addChild(nodeId);
-        id(nodeId, true);
+        id(nodeId, true, true);
 
         String strIdName = "";
         Node temp = nodeId;
@@ -905,7 +944,7 @@ public class Parser {
         strIdName = temp.data;
 
         if (!hash.itemExists(strIdName)) {
-            hash.addItem(strIdName, strTipo);
+            hash.addItem(strIdName, true, strTipo);
         } else {
             erro("Variável \"" + strIdName + "\" já declarada", temp.token);
         }
@@ -924,10 +963,10 @@ public class Parser {
 
                 Node nodeIdP = new Node("id");
                 nodeParams.addChild(nodeIdP);
-                id(nodeIdP, true);
+                id(nodeIdP, true, true);
                 params.add(nodeId.getFirstLeaf(nodeIdP).data);
 
-                Token tk = Utils.addHash(nodeTipoP, nodeIdP, hash);
+                Token tk = Utils.addHash(nodeTipoP, nodeIdP, hash, true);
                 if (tk != null) {
                     erro("Variável \"" + tk.lexema + "\" já declarada", tk);
                 }
@@ -945,10 +984,10 @@ public class Parser {
                     tipo(nodeTipoP2);
                     Node nodeIdP2 = new Node("id");
                     nodeParams.addChild(nodeIdP2);
-                    id(nodeIdP2, true);
+                    id(nodeIdP2, true, true);
                     params.add(nodeId.getFirstLeaf(nodeIdP2).data);
 
-                    tk = Utils.addHash(nodeTipoP2, nodeIdP2, hash);
+                    tk = Utils.addHash(nodeTipoP2, nodeIdP2, hash, true);
                     if (tk != null) {
                         erro("Variável \"" + tk.lexema + "\" já declarada", tk);
                     }
@@ -1029,7 +1068,7 @@ public class Parser {
 
             Node nodeId = new Node("id");
             newNode.addChild(nodeId);
-            id(nodeId, false);
+            id(nodeId, false, true);
 
             if (matchL("->") || matchL("[")) {
                 newNode.data = "atribuicao";

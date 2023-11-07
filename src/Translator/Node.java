@@ -86,7 +86,8 @@ public class Node {
       return;
 
     if (node.IsLeaf()) {
-      leafs.add(node.token);
+      if (node.token != null)
+        leafs.add(node.token);
     }
     for (Node child : node.getChildren()) {
       walkLeafs(child, leafs);

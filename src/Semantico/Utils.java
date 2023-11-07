@@ -4,7 +4,7 @@ import Translator.Node;
 import Utils.Token;
 
 public class Utils {
-    public static Token addHash(Node nodeTipo, Node nodeId, IdHash hash) {
+    public static Token addHash(Node nodeTipo, Node nodeId, IdHash hash, boolean func) {
         String strTipo = "";
         Node temp = nodeTipo;
         while (temp.getChildren().size() > 0) {
@@ -20,7 +20,7 @@ public class Utils {
         strIdName = temp.data;
 
         if (!hash.itemExists(strIdName)) {
-            hash.addItem(strIdName, strTipo);
+            hash.addItem(strIdName, func, strTipo);
             return null;
         } else {
             return temp.token;
