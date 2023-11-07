@@ -72,4 +72,28 @@ public class Node {
       walk(child);
     }
   }
+
+  public Node getFirstLeaf(Node node) {
+    if (node.IsLeaf()) {
+      return node;
+    }
+
+    return getFirstLeaf(node.getChild(0));
+  }
+
+  public void walkLeafs(Node node, ArrayList<Token> leafs) {
+    if (node == null)
+      return;
+
+    if (node.IsLeaf()) {
+      leafs.add(node.token);
+    }
+    for (Node child : node.getChildren()) {
+      walkLeafs(child, leafs);
+    }
+  }
+
+  public void getLeafs(ArrayList<Token> leafs) {
+    walkLeafs(this, leafs);
+  }
 }

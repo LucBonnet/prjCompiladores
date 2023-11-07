@@ -2,6 +2,8 @@ package Parser;
 
 import Semantico.IdHash;
 import Semantico.Utils;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import Translator.Node;
@@ -193,6 +195,7 @@ public class Parser {
             }
             Node valor = new Node(data);
             node.addChild(valor);
+            valor.token = token;
             getNextToken();
         } else {
             erro();
@@ -319,11 +322,21 @@ public class Parser {
 
         if (index > -1) {
             Node op = new Node(tr[index]);
+            if (tr[index].equals("==")) {
+                Node id = node.getFirstLeaf(node);
+                String tipo = hash.getItem(id.data);
+                if (tipo == "String" || id.data.contains('"' + "")) {
+                    node.enter = "(" + node.enter;
+                    op.data = ").equals(";
+                    node.exit += ")";
+                }
+            }
             node.addChild(op);
             getNextToken();
         } else {
             erro();
         }
+
     }
 
     public void fator(Node node) {
@@ -427,18 +440,98 @@ public class Parser {
         expressaoL(node);
     }
 
+    public boolean verTipoDeclaracao(ArrayList<Token> termos, String tipo) {
+        switch (tipo) {
+            case "int": {
+                for (Token termo : termos) {
+                    if (termo.tipo.equals("TEXT") ||
+                            termo.tipo.equals("DEC") ||
+                            termo.tipo.equals("CHAR") ||
+                            termo.tipo.equals("RES_FLS") ||
+                            termo.tipo.equals("RES_VER")) {
+                        return false;
+                    }
+                }
+                break;
+            }
+            case "double": {
+                for (Token termo : termos) {
+                    if (termo.tipo.equals("TEXT") ||
+                            termo.tipo.equals("CHAR") ||
+                            termo.tipo.equals("RES_FLS") ||
+                            termo.tipo.equals("RES_VER")) {
+                        return false;
+                    }
+                }
+                break;
+            }
+            case "String": {
+                int numStrings = 0;
+                for (Token termo : termos) {
+                    if (termo.tipo.equals("TEXT")) {
+                        numStrings++;
+                    }
+                }
+
+                if (numStrings == 0) {
+                    return false;
+                }
+                break;
+            }
+            case "char": {
+                if (termos.size() > 1) {
+                    return false;
+                }
+                for (Token termo : termos) {
+                    if (termo.tipo.equals("TEXT") ||
+                            termo.tipo.equals("DEC") ||
+                            termo.tipo.equals("INT") ||
+                            termo.tipo.equals("RES_FLS") ||
+                            termo.tipo.equals("RES_VER")) {
+                        return false;
+                    }
+                }
+                break;
+            }
+            case "boolean": {
+                for (Token termo : termos) {
+                    if (termo.tipo.equals("TEXT") ||
+                            termo.tipo.equals("DEC") ||
+                            termo.tipo.equals("INT") ||
+                            termo.tipo.equals("CHAR")) {
+                        return false;
+                    }
+                }
+                break;
+            }
+        }
+
+        return true;
+    }
+
     public void atribuicao(Node node, Node nodeId) {
         if (nodeId == null) {
             Node id = new Node("id");
             node.addChild(id);
-            idFator(nodeId);
+            idFator(id);
 
             if (matchL("->")) {
                 Node op = new Node("=");
                 node.addChild(op);
                 getNextToken();
 
-                expressao(node);
+                Node expressao = new Node("expressao");
+                node.addChild(expressao);
+                expressao(expressao);
+
+                ArrayList<Token> termos = new ArrayList<>();
+                expressao.getLeafs(termos);
+
+                String tipo = hash.getItem(id.getFirstLeaf(nodeId).data);
+
+                if (!verTipoDeclaracao(termos, tipo)) {
+                    erro("Tipagem incorreta", termos.get(0));
+                }
             } else {
                 erro();
             }
@@ -447,7 +540,21 @@ public class Parser {
             node.addChild(op);
             getNextToken();
 
-            expressao(node);
+            String tipo = hash.getItem(nodeId.getFirstLeaf(nodeId).data);
+
+            if (!matchL("["))
+                op.exit += "(" + tipo + ")";
+
+            Node expressao = new Node("expressao");
+            node.addChild(expressao);
+            expressao(expressao);
+
+            ArrayList<Token> termos = new ArrayList<>();
+            expressao.getLeafs(termos);
+
+            if (!verTipoDeclaracao(termos, tipo)) {
+                erro("Tipagem incorreta", termos.get(0));
+            }
         } else if (matchL("[")) {
             idLista(nodeId);
 
@@ -472,12 +579,15 @@ public class Parser {
         node.addChild(nodeId);
         idDec(nodeId);
 
+        Token tk = Utils.addHash(nodeTipo, nodeId, hash);
+        if (tk != null) {
+            erro("Variável \"" + tk.lexema + "\" já declarada", tk);
+        }
+
         atribuicao(node, nodeId);
 
-        Token tk = new Token();
-        String r;
-        if ((r = (Utils.addHash(nodeTipo, nodeId, hash, tk))) != null) {
-            erro(r, tk);
+        if (matchL("<")) {
+            erro();
         }
     }
 
@@ -498,7 +608,7 @@ public class Parser {
 
     private void rtn(Node node) {
         if (matchL("rtn")) {
-            node.enter = "return";
+            node.enter = "return ";
             getNextToken();
             Node nodeExpressao = new Node("expressao");
             node.addChild(nodeExpressao);
@@ -508,9 +618,9 @@ public class Parser {
     }
 
     private void bloco(Node node) {
+        Node bloco = new Node("bloco");
+        node.addChild(bloco);
         if (matchL("{")) {
-            Node bloco = new Node("bloco");
-            node.addChild(bloco);
             bloco.enter = "{";
             getNextToken();
 
@@ -528,14 +638,14 @@ public class Parser {
                 bloco.exit = "}";
             }
         } else {
-            instrucao(node);
+            instrucao(bloco);
         }
     }
 
     private void elseM(Node node) {
         if (matchL("&")) {
             Node elseN = new Node("else");
-            elseN.enter = "else";
+            elseN.enter = "else ";
             node.addChild(elseN);
 
             getNextToken();
@@ -716,7 +826,13 @@ public class Parser {
                     getNextToken();
                     Node nodeId = new Node("id");
                     node.addChild(nodeId);
-                    idFator(nodeId);
+                    idDec(nodeId);
+
+                    Token tk = Utils.addHash(nodeTipo, nodeId, hash);
+                    if (tk != null) {
+                        erro("Variável \"" + tk.lexema + "\" já declarada", tk);
+                    }
+
                     if (matchL(">")) {
                         getNextToken();
                     } else {
@@ -743,7 +859,7 @@ public class Parser {
                         break;
                 }
 
-                node.exit += "();\nsc" + numScanner + ".close();\n";
+                node.exit += "();\n";
             }
         } else {
             erro();
@@ -751,6 +867,7 @@ public class Parser {
     }
 
     private void func(Node node) {
+        ArrayList<String> params = new ArrayList<>();
 
         Node nodeFunc = new Node("func");
         getNextToken();
@@ -801,19 +918,20 @@ public class Parser {
             nodeParams.enter = "(";
 
             if (matchTipo()) {
-                Node nodeTipoP = new Node("id");
+                Node nodeTipoP = new Node("tipo");
                 nodeParams.addChild(nodeTipoP);
                 tipo(nodeTipoP);
 
                 Node nodeIdP = new Node("id");
                 nodeParams.addChild(nodeIdP);
                 id(nodeIdP, true);
+                params.add(nodeId.getFirstLeaf(nodeIdP).data);
 
-                Token tk = new Token();
-                String r;
-                if ((r = (Utils.addHash(nodeTipoP, nodeIdP, hash, tk))) != null) {
-                    erro(r, tk);
+                Token tk = Utils.addHash(nodeTipoP, nodeIdP, hash);
+                if (tk != null) {
+                    erro("Variável \"" + tk.lexema + "\" já declarada", tk);
                 }
+
                 while (!matchL(">")) {
                     if (matchL(",")) {
                         getNextToken();
@@ -828,11 +946,11 @@ public class Parser {
                     Node nodeIdP2 = new Node("id");
                     nodeParams.addChild(nodeIdP2);
                     id(nodeIdP2, true);
+                    params.add(nodeId.getFirstLeaf(nodeIdP2).data);
 
-                    Token tk1 = new Token();
-                    String r1;
-                    if ((r1 = (Utils.addHash(nodeTipoP2, nodeIdP2, hash, tk1))) != null) {
-                        erro(r1, tk1);
+                    tk = Utils.addHash(nodeTipoP2, nodeIdP2, hash);
+                    if (tk != null) {
+                        erro("Variável \"" + tk.lexema + "\" já declarada", tk);
                     }
                 }
 
@@ -841,6 +959,10 @@ public class Parser {
                     nodeParams.exit = ")";
 
                     bloco(nodeFunc);
+
+                    for (String param : params) {
+                        hash.tblHash.remove(param);
+                    }
                 } else {
                     erro();
                 }
@@ -1004,9 +1126,9 @@ public class Parser {
 
         tree = new Tree(nodeRoot);
 
-        System.out.println("===============");
-        hash.print();
-        System.out.println("===============");
+        // System.out.println("===============");
+        // hash.print();
+        // System.out.println("===============");
 
         if (numErros > 0) {
             tree.root = null;

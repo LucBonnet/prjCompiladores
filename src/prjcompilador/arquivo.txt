@@ -1,3 +1,1 @@
-fnc int soma<int b, int c>{}
-
-int soma<10, 3> -> 10
+dec a[] -> [1, 2, 3, 4, 5, 6]

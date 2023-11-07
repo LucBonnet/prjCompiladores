@@ -55,9 +55,6 @@ public class PrjCompilador {
 
         System.out.println(code);
 
-        // Analaisador Semântico
-        // TODO
-
         // Criação do arquivo Main.java
         String pathFileOutput = System.getProperty("user.dir") + "./Main.java";
         try {
@@ -67,18 +64,6 @@ public class PrjCompilador {
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-        }
-
-        ProcessBuilder processBuilder = new ProcessBuilder("java", "Main");
-        Process process;
-        try {
-            process = processBuilder.start();
-            int exitCode = process.waitFor();
-            System.out.println("O processo terminou com código de saída " + exitCode);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        } catch (InterruptedException ex) {
-            System.out.println(ex);
         }
     }
 }

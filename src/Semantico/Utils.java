@@ -4,7 +4,7 @@ import Translator.Node;
 import Utils.Token;
 
 public class Utils {
-    public static String addHash(Node nodeTipo, Node nodeId, IdHash hash, Token tk) {
+    public static Token addHash(Node nodeTipo, Node nodeId, IdHash hash) {
         String strTipo = "";
         Node temp = nodeTipo;
         while (temp.getChildren().size() > 0) {
@@ -23,8 +23,7 @@ public class Utils {
             hash.addItem(strIdName, strTipo);
             return null;
         } else {
-            tk = temp.token;
-            return "Variável \"" + strIdName + "\" já declarada";
+            return temp.token;
         }
     }
 }

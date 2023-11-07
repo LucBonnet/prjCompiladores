@@ -1,0 +1,50 @@
+fnc dec soma<int a, int b> {
+    rtn a + b
+}
+
+fnc dec sub<int a, int b> {
+    rtn a - b
+}
+
+fnc dec mult<int a, int b> {
+    rtn a * b
+}
+
+fnc dec div<int a, int b> {
+    rtn a / b
+}
+
+fnc dec pow<int a, int b> {
+    rtn a ^ b
+}
+
+prtln<"Digite o primeiro numero:">
+ent<int,num1>
+
+prtln<"Digite a opeacao:">
+prtln<"1 - soma">
+prtln<"2 - subtracao">
+prtln<"3 - multiplicação">
+prtln<"4 - divisao">
+prtln<"5 - elevado">
+
+ent<int,op>
+
+prtln<"Digite o segundo numero:">
+ent<int,num2>
+
+dec result -> 0
+
+? <op equ 1>
+    result -> soma<num1, num2>
+& ? <op equ 2>
+    result -> sub<num1, num2>
+& ? <op equ 3>
+    result -> mult<num1, num2>
+& ? <op equ 4>
+    result -> div<num1, num2>
+& ? <op equ 5>
+    result -> pow<num1, num2>
+& prtln<"Operacao incorreta">
+
+prtln<"Resultado: " + result>
