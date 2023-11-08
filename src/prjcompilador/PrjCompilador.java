@@ -1,11 +1,16 @@
 package prjcompilador;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import Lexer.Lexer;
 import Parser.Parser;
@@ -18,7 +23,19 @@ public class PrjCompilador {
 
         // Leitura do arquivo
         String texto = "";
-        String pathFile = System.getProperty("user.dir") + "/src/prjcompilador/arquivo.txt";
+        // Path root = FileSystems.getDefault().getPath("").toAbsolutePath();
+        // String pathFile = Paths.get(root.toString(), "").toAbsolutePath().toString();
+        // String[] paths = pathFile.split(Pattern.quote(File.separator));
+        // pathFile = "";
+        // for (String path : paths) {
+        // pathFile += path + "\\";
+        // if (path.equals("prjCompiladores")) {
+        // break;
+        // }
+        // }
+        // pathFile += "arquivo.txt";
+
+        String pathFile = System.getProperty("user.dir") + "/prjCompiladores/src/prjcompilador/arquivo.txt";
         try (BufferedReader buffRead = new BufferedReader(new FileReader(pathFile))) {
             String linha = "";
             while ((linha = buffRead.readLine()) != null) {

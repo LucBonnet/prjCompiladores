@@ -1,15 +1,13 @@
 import java.util.Scanner;
 class Main {
-public static void quocienteResto ( double  dividendo , double  divisor ){ double  vezes  = (double) 0 ;
-while( dividendo  >=  divisor ){ vezes  = (double) vezes + divisor ;
- dividendo  = (double) dividendo - divisor ;
-}System.out.println( "Quociente: " + vezes );System.out.println( "Resto: " + dividendo );}
+  
 public static void main (String args[]){
- double  dividendo ;
- double  divisor ;
-System.out.print( "Digite o dividendo: " );Scanner sc172 = new Scanner(System.in);   dividendo  = sc172.nextDouble();
-System.out.print( "Digite o divisor: " );Scanner sc202 = new Scanner(System.in);   divisor  = sc202.nextDouble();
-System.out.println( "" ); quocienteResto ( dividendo , divisor );
-
+ double  notas [] = { 0 , 0 , 0 , 0 };
+ double  soma  = (double) 0 ;
+for( int  i  = (int) 0 ;
+ i  <  4 ; i  =  i + 1 ){System.out.println( "Ditgite a nota " +( i + 1 )+ ":" );Scanner sc64 = new Scanner(System.in);   notas [ i ] = sc64.nextDouble();
+ soma  = (double) soma + notas [ i ];
+} double  media  = (double)( soma  /  4 );
+System.out.println( "Media das notas: " + media );if( media  >=  5 ){System.out.println( "Aprovado" );}else {System.out.println( "Reprovado" );}
 }
 }

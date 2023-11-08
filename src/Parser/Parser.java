@@ -6,9 +6,12 @@ import Semantico.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.lang.model.element.VariableElement;
+
 import Translator.Node;
 import Translator.Tree;
 import Utils.Token;
+import Utils.Variavel;
 
 public class Parser {
 
@@ -47,14 +50,17 @@ public class Parser {
         numErros++;
 
         erro = true;
+        Token temp;
         if (this.token == null) {
-            System.out.println("Erro: " + tokenAnterior);
+            temp = this.tokenAnterior;
         } else {
-            System.out.println("Erro: " + this.token);
-            System.out.println("Linha: " + this.token.linha);
-            System.out.println("Coluna: " + this.token.coluna);
-            System.out.println("");
+            temp = this.token;
         }
+
+        System.out.println("Erro: \"" + temp.lexema + "\"");
+        System.out.println("Linha: " + temp.linha);
+        System.out.println("Coluna: " + temp.coluna);
+        System.out.println("");
 
         getNextToken();
 
@@ -71,15 +77,18 @@ public class Parser {
         numErros++;
 
         erro = true;
-        if (token == null) {
-            System.out.println("Erro: " + tokenAnterior);
+        Token temp;
+        if (this.token == null) {
+            temp = this.tokenAnterior;
         } else {
-            System.out.println("Erro: " + token);
-            System.out.println("Linha: " + token.linha);
-            System.out.println("Coluna: " + token.coluna);
-            System.out.println(msg);
-            System.out.println("");
+            temp = this.token;
         }
+
+        System.out.println("Erro: \"" + temp.lexema + "\"");
+        System.out.println(msg);
+        System.out.println("Linha: " + temp.linha);
+        System.out.println("Coluna: " + temp.coluna);
+        System.out.println("");
 
         if (token == null) {
             System.exit(0);
@@ -110,6 +119,18 @@ public class Parser {
         return false;
     }
 
+    public String verValor(Token token) {
+        String tipos[] = { "int", "dec", "txt", "lgc", "ltr" };
+
+        for (String tipo : tipos) {
+            if (token.tipo.equals(tipo)) {
+                return tipo;
+            }
+        }
+
+        return "";
+    }
+
     public Boolean matchTipo() {
         String tipos[] = { "int", "dec", "txt", "lgc", "ltr" };
 
@@ -135,7 +156,7 @@ public class Parser {
     }
 
     public Boolean matchOpT() {
-        String opTs[] = { "^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari" };
+        String opTs[] = { "^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari", "dif" };
 
         for (String op : opTs) {
             if (matchL(op)) {
@@ -313,8 +334,8 @@ public class Parser {
     }
 
     public void opT(Node node) {
-        String opTs[] = { "^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari" };
-        String tr[] = { "^", "*", "%", "/", "<", ">", "==", "<=", ">=" };
+        String opTs[] = { "^", "*", "rst", "/", "mnr", "mar", "equ", "mnri", "mari", "dif" };
+        String tr[] = { "^", "*", "%", "/", "<", ">", "==", "<=", ">=", "!=" };
 
         int index = -1;
         for (int i = 0; i < opTs.length; i++) {
@@ -326,13 +347,26 @@ public class Parser {
 
         if (index > -1) {
             Node op = new Node(tr[index]);
-            if (tr[index].equals("==")) {
+            if (tr[index].equals("==") || tr[index].equals("!=")) {
                 Node id = node.getFirstLeaf(node);
-                String tipo = hash.getItem(id.data).tipo;
-                if (tipo == "String" || id.data.contains('"' + "")) {
-                    node.enter = "(" + node.enter;
-                    op.data = ").equals(";
-                    node.exit += ")";
+                if (id.token.tipo.equals("ID")) {
+                    String tipo = hash.getItem(id.data).tipo;
+                    if (tipo == "String") {
+                        node.enter = "(" + node.enter;
+                        if (tr[index].equals("!="))
+                            node.enter = "!" + node.enter;
+                        op.data = ").equals(";
+                        node.exit += ")";
+                    }
+                } else {
+                    String tipo = verValor(id.token);
+                    if (tipo.equals("TXT")) {
+                        node.enter = "(" + node.enter;
+                        if (tr[index].equals("!="))
+                            node.enter = "!" + node.enter;
+                        op.data = ").equals(";
+                        node.exit += ")";
+                    }
                 }
             }
             node.addChild(op);
@@ -347,7 +381,6 @@ public class Parser {
     public void fator(Node node) {
         Node fator = new Node("fator");
         node.addChild(fator);
-        System.out.println(token);
         if (matchT("ID")) {
             Node nodeId = new Node("id");
             fator.addChild(nodeId);
@@ -515,6 +548,7 @@ public class Parser {
                             termo.lexema.equals("mnr") ||
                             termo.lexema.equals("mar") ||
                             termo.lexema.equals("mari") ||
+                            termo.lexema.equals("dif") ||
                             termo.lexema.equals("mnri")) {
                         return true;
                     }
@@ -617,17 +651,7 @@ public class Parser {
     private void condicao(Node node) {
         Node expressao = new Node("expressao");
         node.addChild(expressao);
-        System.out.println(token);
         expressao(expressao);
-
-        // int controle = expressao.IsString();
-        // if (controle > 0) {
-        // node.enter += "Boolean.parseBoolean(";
-        // node.exit += ")";
-        // } else if (controle == 0) {
-        // node.enter += "(";
-        // node.exit += ") == 0 ? false : true";
-        // }
 
         ArrayList<Token> termos = new ArrayList<>();
         expressao.getLeafs(termos);
@@ -660,6 +684,7 @@ public class Parser {
         Node bloco = new Node("bloco");
         node.addChild(bloco);
         if (matchL("{")) {
+            hash.escopo++;
             bloco.enter = "{";
             getNextToken();
 
@@ -673,6 +698,18 @@ public class Parser {
             }
 
             if (matchL("}")) {
+                ArrayList<String> ids = new ArrayList<>();
+                for (Variavel v : hash.tblHash.values()) {
+                    if (v.escopo == hash.escopo) {
+                        ids.add(v.id);
+                    }
+                }
+
+                for (String id : ids) {
+                    hash.tblHash.remove(id);
+                }
+
+                hash.escopo--;
                 getNextToken();
                 bloco.exit = "}";
             }
@@ -796,8 +833,10 @@ public class Parser {
 
             Node nodeParametros = new Node(" parametros for");
             node.addChild(nodeParametros);
+            hash.escopo++;
             forParametros(nodeParametros);
 
+            hash.escopo--;
             Node nodeBloco = new Node("bloco");
             node.addChild(nodeBloco);
             bloco(nodeBloco);
@@ -865,7 +904,7 @@ public class Parser {
                     getNextToken();
                     Node nodeId = new Node("id");
                     node.addChild(nodeId);
-                    id(nodeId, false, true);
+                    idFator(nodeId);
 
                     hash.getItem(nodeId.getFirstLeaf(nodeId).data).valor = true;
 
@@ -934,6 +973,9 @@ public class Parser {
         nodeFunc.addChild(nodeId);
         id(nodeId, true, true);
 
+        if (erro)
+            return;
+
         String strIdName = "";
         Node temp = nodeId;
         while (temp.getChildren().size() > 0) {
@@ -963,6 +1005,9 @@ public class Parser {
                 nodeParams.addChild(nodeIdP);
                 id(nodeIdP, true, true);
                 params.add(nodeId.getFirstLeaf(nodeIdP).data);
+
+                if (erro)
+                    return;
 
                 Token tk = Utils.addHash(nodeTipoP, nodeIdP, hash, true);
                 if (tk != null) {
@@ -1067,6 +1112,10 @@ public class Parser {
             Node nodeId = new Node("id");
             newNode.addChild(nodeId);
             id(nodeId, false, true);
+
+            if (erro) {
+                return false;
+            }
 
             if (matchL("->") || matchL("[")) {
                 newNode.data = "atribuicao";

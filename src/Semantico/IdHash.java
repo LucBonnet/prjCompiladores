@@ -7,6 +7,7 @@ import Utils.Variavel;
 
 public class IdHash {
     public Map<String, Variavel> tblHash;
+    public int escopo = 0;
 
     public IdHash() {
         tblHash = new HashMap<String, Variavel>();
@@ -14,7 +15,7 @@ public class IdHash {
 
     public void addItem(String key, boolean value, String tipo) {
         // idName, idValue, idType
-        Variavel v = new Variavel(value, tipo);
+        Variavel v = new Variavel(key, value, tipo, escopo);
         tblHash.put(key, v);
     }
 

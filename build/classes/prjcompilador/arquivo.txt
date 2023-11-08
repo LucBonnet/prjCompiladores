@@ -1,4 +1,0 @@
-txt b -> "oi"
-int a -> 10
-
-prt<"oi" equ "oi">
