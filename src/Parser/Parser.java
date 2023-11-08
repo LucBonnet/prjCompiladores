@@ -865,12 +865,9 @@ public class Parser {
                     getNextToken();
                     Node nodeId = new Node("id");
                     node.addChild(nodeId);
-                    idDec(nodeId);
+                    id(nodeId, false, true);
 
-                    Token tk = Utils.addHash(nodeTipo, nodeId, hash, true);
-                    if (tk != null) {
-                        erro("Variável \"" + tk.lexema + "\" já declarada", tk);
-                    }
+                    hash.getItem(nodeId.getFirstLeaf(nodeId).data).valor = true;
 
                     if (matchL(">")) {
                         getNextToken();
@@ -899,6 +896,7 @@ public class Parser {
                 }
 
                 node.exit += "();\n";
+                nodeTipo.getFirstLeaf(nodeTipo).data = "";
             }
         } else {
             erro();

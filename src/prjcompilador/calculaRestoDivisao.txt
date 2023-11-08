@@ -10,9 +10,6 @@ fnc quocienteResto<dec dividendo, dec divisor> {
   prtln<"Resto: " + dividendo>
 }
 
-dec dividendo
-dec divisor
-
 prt<"Digite o dividendo: ">
 ent<dec, dividendo>
 
