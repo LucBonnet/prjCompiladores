@@ -1,0 +1,18 @@
+dec notas[] -> [0, 0, 0, 0]
+
+dec soma -> 0
+looplim<int i -> 0 | i mnr 4 | i -> i + 1> {
+  prtln<"Ditgite a nota " + (i + 1) + ":">
+  ent<dec,notas[i]>
+  soma -> soma + notas[i]
+}
+
+dec media -> (soma / 4)
+prtln<"Media das notas: " + media>
+
+? <media mari 5> {
+  prtln<"Aprovado">
+} & {
+  prtln<"Reprovado">
+
+}

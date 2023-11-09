@@ -1,0 +1,21 @@
+fnc quocienteResto<dec dividendo, dec divisor> {
+  dec vezes -> 0
+
+  loop <dividendo mari divisor> {
+    vezes -> vezes + divisor
+    dividendo -> dividendo - divisor
+  }
+
+  prtln<"Quociente: " + vezes>
+  prtln<"Resto: " + dividendo>
+}
+
+prt<"Digite o dividendo: ">
+ent<dec, dividendo>
+
+prt<"Digite o divisor: ">
+ent<dec, divisor>
+
+prtln<"">
+
+quocienteResto<dividendo, divisor>
