@@ -1,0 +1,22 @@
+fnc dec soma<int a, int b> {
+   rtn a + b
+}
+
+? <soma<10, 20> equ 30> {
+    looplim <int i -> 0 | i mnr 10 | i -> i + 1> {
+         prt<i + " ">
+    }
+
+
+    int i -> 10
+    ? <i mari 10> {
+        prtln<"Maior que 10">
+    } & {
+        prtln<"Menor que 10">
+    }
+
+    loop<i dif 0> {
+        prtln<i>
+        i -> i - 1
+    }
+}
